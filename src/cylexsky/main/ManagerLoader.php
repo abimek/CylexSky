@@ -4,12 +4,16 @@ declare(strict_types=1);
 namespace cylexsky\main;
 
 use cylexsky\misc\MiscManager;
+use cylexsky\session\SessionManager;
+use cylexsky\worlds\WorldManager;
 use Exception;
 
 final class ManagerLoader{
 
     public const MANAGERS = [
-        MiscManager::class
+        WorldManager::class,
+        MiscManager::class,
+        SessionManager::class
     ];
 
     private static $managers = [];
