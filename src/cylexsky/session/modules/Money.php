@@ -28,13 +28,13 @@ class Money extends BaseModule
 
     public function addMoney(int $amount, bool $sendMessage = false)
     {
-        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Added " . $amount . Glyphs::GOLD_COINS . Glyphs::BOX_EXCLAMATION);
+        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Added " . $amount . Glyphs::GOLD_COIN . Glyphs::BOX_EXCLAMATION);
         $this->money += $amount;
     }
 
     public function removeMoney(int $amount, bool $sendMessage = false)
     {
-        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Removed " . $amount . Glyphs::GOLD_COINS . Glyphs::BOX_EXCLAMATION);
+        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Removed " . $amount . Glyphs::GOLD_COIN . Glyphs::BOX_EXCLAMATION);
         $this->money -= abs($amount);
     }
 

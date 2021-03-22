@@ -9,6 +9,8 @@ use core\main\data\formatter\JsonFormatter;
 use core\players\objects\PlayerObject;
 use cylexsky\session\modules\Level;
 use cylexsky\session\modules\Money;
+use cylexsky\session\modules\Stats;
+use cylexsky\session\modules\Toggles;
 use cylexsky\session\PlayerSession;
 use cylexsky\session\SessionManager;
 
@@ -19,7 +21,7 @@ final class PlayerSessionDatabaseHandler{
     public const NULL_STRING = "\-/+-76fuwWugmJ76os,#909^%";
 
     public static function init(){
-        DatabaseManager::emptyQuery("CREATE TABLE IF NOT EXISTS player_sessions(xuid VARCHAR(36) PRIMARY KEY, username TEXT, island TEXT, money TEXT, level INTEGER)");
+        DatabaseManager::emptyQuery("CREATE TABLE IF NOT EXISTS player_sessions(xuid VARCHAR(36) PRIMARY KEY, username TEXT, island TEXT, money TEXT, toggles TEXT, stats TEXT, level INTEGER)");
     }
 
     public static function createSession(PlayerObject $object){
@@ -31,18 +33,20 @@ final class PlayerSessionDatabaseHandler{
             $xuid
         ], function ($results)use($object){
            foreach ($results as $data){
-               $session = new PlayerSession($object, $data["island"], $data["level"], $data["money"]);
+               $session = new PlayerSession($object, $data["island"], $data["level"], $data["money"], $data["toggles"], $data["stats"]);
                SessionManager::createSession($session);
                return;
            }
-           DatabaseManager::emptyQuery("INSERT IGNORE INTO player_sessions(xuid, username, island, level, money) VALUES(?, ?, ?, ?, ?);", Query::SERVER_DB, [
+           DatabaseManager::emptyQuery("INSERT IGNORE INTO player_sessions(xuid, username, island, level, money, toggles, stats) VALUES(?, ?, ?, ?, ?, ?, ?);", Query::SERVER_DB, [
                $object->getXuid(),
                $object->getUsername(),
                self::NULL_STRING,
                self::staticEncodeJson(Level::getBaseData()),
-               self::staticEncodeJson(Money::getBaseData())
+               self::staticEncodeJson(Money::getBaseData()),
+               self::staticEncodeJson(Toggles::getBaseData()),
+               self::staticEncodeJson(Stats::getBaseData())
            ]);
-            $session = new PlayerSession($object, self::NULL_STRING, self::staticEncodeJson(Level::getBaseData()), self::staticEncodeJson(Money::getBaseData()));
+            $session = new PlayerSession($object, self::NULL_STRING, self::staticEncodeJson(Level::getBaseData()), self::staticEncodeJson(Money::getBaseData()), self::staticEncodeJson(Toggles::getBaseData()),  self::staticEncodeJson(Stats::getBaseData()));
             SessionManager::createSession($session);
         });
         DatabaseManager::query($query);
@@ -60,6 +64,4 @@ final class PlayerSessionDatabaseHandler{
         $session->save();
         SessionManager::removeSession($object);
     }
-
-
 }

@@ -5,7 +5,9 @@ namespace cylexsky\session\modules;
 
 class Boosters extends BaseModule{
 
-    private $xpBooster = 1;
+    public const XP_BOOSTER_LIMIT = 1.5;
+
+    private $xpBooster = 1.0;
 
     public function init(array $data)
     {
@@ -13,16 +15,27 @@ class Boosters extends BaseModule{
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getXpBooster(): int
+    public function getXpBooster(): float
     {
         return $this->xpBooster;
     }
 
+    public function addXpBooster(float $amount){
+        $amount = abs($amount);
+        if($this->xpBooster < self::XP_BOOSTER_LIMIT){
+            if ($amount > self::XP_BOOSTER_LIMIT - $this->xpBooster){
+                $this->xpBooster = self::XP_BOOSTER_LIMIT;
+            }else{
+                $this->xpBooster += $amount;
+            }
+        }
+    }
+
     public static function getBaseData(): array
     {
-        return [1];
+        return [1.0];
     }
 
     public function save()
