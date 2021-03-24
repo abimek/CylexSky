@@ -21,7 +21,8 @@ final class PlayerSessionDatabaseHandler{
     public const NULL_STRING = "\-/+-76fuwWugmJ76os,#909^%";
 
     public static function init(){
-        DatabaseManager::emptyQuery("CREATE TABLE IF NOT EXISTS player_sessions(xuid VARCHAR(36) PRIMARY KEY, username TEXT, island TEXT, money TEXT, toggles TEXT, stats TEXT, level INTEGER)");
+      //  DatabaseManager::emptyQuery("DROP TABLE player_sessions");
+        DatabaseManager::emptyQuery("CREATE TABLE IF NOT EXISTS player_sessions(xuid VARCHAR(36) PRIMARY KEY, username TEXT, island TEXT, money TEXT, toggles TEXT, stats TEXT, level TEXT)");
     }
 
     public static function createSession(PlayerObject $object){

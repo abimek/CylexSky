@@ -11,31 +11,32 @@ use cylexsky\session\database\PlayerSessionDatabaseHandler;
 class SessionManager extends Manager{
 
     private static $sessions;
-    private static $databaseHandlers;
 
     protected function init(): void
     {
-        self::$databaseHandlers = new PlayerSessionDatabaseHandler();
+        PlayerSessionDatabaseHandler::init();
         $this->initCreationDeletionCallables();
     }
 
     private function initCreationDeletionCallables(){
 
-        PlayerManager::addPlayerSessionCreationCallable(function (PlayerObject $object){
+        PlayerManager::addPlayerSessionCreationCallable(function (\core\players\session\PlayerSession $object){
+            $object = $object->getObject();
             PlayerSessionDatabaseHandler::createSession($object);
         });
-        PlayerManager::addPlayerSessionDestructionCallable(function (PlayerObject $object){
+        PlayerManager::addPlayerSessionDestructionCallable(function (\core\players\session\PlayerSession $object){
+            $object = $object->getObject();
             PlayerSessionDatabaseHandler::deleteSession($object);
         });
     }
 
     public static function createSession(PlayerSession $session){
         if (!self::sessionExists($session->getXuid())){
-            $sessions[$session->getXuid()] = $session;
+            self::$sessions[$session->getXuid()] = $session;
         }
     }
 
-    public static function getSession(string $xuid): PlayerSession{
+    public static function getSession(string $xuid): ?PlayerSession{
         return self::sessionExists($xuid) ? self::$sessions[$xuid] : null;
     }
 
@@ -51,6 +52,8 @@ class SessionManager extends Manager{
 
     protected function close(): void
     {
-
+        foreach (self::$sessions as $session){
+            $session->save();
+        }
     }
 }

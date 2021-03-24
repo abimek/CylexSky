@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace cylexsky\main;
 
+use cylexsky\island\IslandManager;
 use cylexsky\misc\MiscManager;
 use cylexsky\session\SessionManager;
 use cylexsky\worlds\WorldManager;
@@ -13,7 +14,8 @@ final class ManagerLoader{
     public const MANAGERS = [
         WorldManager::class,
         MiscManager::class,
-        SessionManager::class
+        SessionManager::class,
+        IslandManager::class
     ];
 
     private static $managers = [];

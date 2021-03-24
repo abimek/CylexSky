@@ -10,12 +10,12 @@ class Money extends BaseModule
 {
 
     private $money;
-    private $silver;
+    private $opal;
 
     public function init(array $data)
     {
         $this->money = $data[0];
-        $this->silver = $data[1];
+        $this->opal = $data[1];
     }
 
     /**
@@ -39,23 +39,23 @@ class Money extends BaseModule
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getSilver()
+    public function getOpal(): int
     {
-        return $this->silver;
+        return $this->opal;
     }
 
-    public function addSilver(int $amount, bool $sendMessage = false)
+    public function addOpal(int $amount, bool $sendMessage = false)
     {
-        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Added " . $amount . Glyphs::SILVER_COINS . Glyphs::BOX_EXCLAMATION);
-        $this->silver += $amount;
+        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Added " . $amount . Glyphs::OPAL . Glyphs::BOX_EXCLAMATION);
+        $this->opal += $amount;
     }
 
-    public function removeSilver(int $amount, bool $sendMessage = false)
+    public function removeOpal(int $amount, bool $sendMessage = false)
     {
-        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Removed " . $amount . Glyphs::SILVER_COINS . Glyphs::BOX_EXCLAMATION);
-        $this->silver -= abs($amount);
+        if ($sendMessage) $this->getSession()->getPlayer()->sendMessage(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Removed " . $amount . Glyphs::OPAL . Glyphs::BOX_EXCLAMATION);
+        $this->opal -= abs($amount);
     }
 
     public static function getBaseData(): array
@@ -65,7 +65,7 @@ class Money extends BaseModule
 
     public function save(): string
     {
-        return $this->encodeJson([$this->money, $this->silver]);
+        return $this->encodeJson([$this->money, $this->opal]);
     }
 
 }

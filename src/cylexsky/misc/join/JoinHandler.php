@@ -41,7 +41,7 @@ class JoinHandler{
         self::sendTotemAnimation($player);
         if ($session !== null && $session->getTogglesModule()->joinMessage()){
             $player->sendMessage(Glyphs::LEXY_LINE_1 . TextFormat::GRAY . "Welcome back " . TextFormat::BOLD_GOLD . "Cylex" . TextFormat::AQUA . "Sky!");
-            $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "An " . TextFormat::RED . " exciting " . TextFormat::GRAY . " journey awaits!");
+            $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "An " . TextFormat::RED . "exciting" . TextFormat::GRAY . " journey awaits!");
             $player->sendMessage(Glyphs::LEXY_LINE_3 . TextFormat::GRAY);
         }
     }

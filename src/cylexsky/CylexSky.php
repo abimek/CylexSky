@@ -2,22 +2,17 @@
 declare(strict_types=1);
 namespace cylexsky;
 
-use core\CylexCore;
 use cylexsky\main\ManagerLoader;
 use pocketmine\plugin\PluginBase;
 
 class CylexSky extends PluginBase {
-
     private static $instance;
-
-    public function onEnable()
+    protected function onEnable(): void
     {
         self::$instance = $this;
         ManagerLoader::init();
     }
-
-    public static function getInstance(): CylexCore{
+    public static function getInstance(): CylexSky{
         return self::$instance;
     }
-
 }

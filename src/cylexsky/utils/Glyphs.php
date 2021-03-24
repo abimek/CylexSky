@@ -5,22 +5,22 @@ namespace cylexsky\utils;
 
 interface Glyphs{
     public const SWORD = "";
-    public const SKULL = "";
+    public const SKULL = "af";
 
-    public const SILVER_COINS = "";
+    public const OPAL = "opals";
 
-    public const GOLD_COIN = "";
+    public const GOLD_COIN = "coins";
 
     //TODO CREATE GLYPHS
-    public const GOLD_MEDAL = "";
+    public const GOLD_MEDAL = "age";
 
     //bassically some mini starts in one thing(SPARKLES)
-    public const SPARKLE = "";
+    public const SPARKLE = "asegf";
 
     //arrow facing right direction
-    public const RIGHT_ARROW = "";
+    public const RIGHT_ARROW = "asegf";
 
-    public const BOX_EXCLAMATION = "";
+    public const BOX_EXCLAMATION = "aesg";
 
     //LEXY FAVE GLYPHS
 

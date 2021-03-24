@@ -6,6 +6,8 @@ namespace cylexsky\session;
 use core\database\DatabaseManager;
 use core\database\objects\Query;
 use core\players\objects\PlayerObject;
+use cylexsky\island\Island;
+use cylexsky\island\IslandManager;
 use cylexsky\session\database\PlayerSessionDatabaseHandler;
 use cylexsky\session\modules\Level;
 use cylexsky\session\modules\Money;
@@ -29,6 +31,11 @@ class PlayerSession{
         $this->object = $object;
         $this->island = $island;
         $this->initModules($moneyData, $levelData, $toggleData, $statsData);
+        if ($this->getIslandObject() !== null){
+            if ($object->getUsername() === $this->getIslandObject()->getOwnerName()){
+                $this->getIslandObject()->ownerJoin($this);
+            }
+        }
     }
 
     public function getPlayer(): Player{
@@ -95,6 +102,13 @@ class PlayerSession{
     public function getIsland(): ?string
     {
         return $this->island;
+    }
+
+    public function getIslandObject(): ?Island{
+        if ($this->island === null){
+            return null;
+        }
+        return IslandManager::getIsland($this->getIsland());
     }
 
     public function save(){

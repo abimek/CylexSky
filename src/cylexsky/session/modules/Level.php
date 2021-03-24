@@ -32,14 +32,15 @@ class Level extends BaseModule {
         $previousLevel = $this->level;
         $this->level++;
         if ($this->level % 5 === 0){
-            $this->getSession()->getMoneyModule()->addSilver($this->getLevel() * 2);
+            $this->getSession()->getMoneyModule()->addOpal($this->getLevel());
+            $this->getSession()->getMoneyModule()->addMoney($this->getLevel() * 3);
         }
         $this->getSession()->getPlayer()->sendPopup(Glyphs::GOLD_MEDAL . TextFormat::GOLD . "You've leveled up!" . Glyphs::GOLD_MEDAL);
         $this->getSession()->getPlayer()->sendSubTitle(Glyphs::SPARKLE . TextFormat::RED . $previousLevel . " " . TextFormat::GRAY . Glyphs::RIGHT_ARROW .  " " .$this->level . Glyphs::SPARKLE);
     }
 
     public function calculateLevel(){
-        if ($this->level >= self::MAX_LEVEL){return;}
+        if ($this->level >= self::MAX_LEVEL){ return;}
         if ($this->xp >= $this->getXpForNextLevel()){
             $this->addLevel();
         }
@@ -52,6 +53,7 @@ class Level extends BaseModule {
     public function addXp(int $amount){
         if ($this->level >= self::MAX_LEVEL){return;}
         $this->xp += abs($amount);
+        $this->calculateLevel();
     }
 
     public static function getBaseData(): array

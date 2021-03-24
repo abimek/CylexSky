@@ -1,0 +1,7 @@
+name: CylexSky
+main: cylexsky\CylexSky
+version: 1.0.0
+api: 4.0.0
+author: Scarce
+depend:
+  - CylexCore

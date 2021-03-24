@@ -6,6 +6,7 @@ namespace cylexsky\misc;
 
 use core\main\managers\Manager;
 use cylexsky\misc\join\JoinHandler;
+use cylexsky\misc\scoreboards\ScoreboardHandler;
 
 class MiscManager extends Manager{
 
@@ -14,11 +15,12 @@ class MiscManager extends Manager{
     protected function init(): void
     {
         self::$instance = $this;
-        $this->init();
+        $this->initHandlers();
     }
 
     private function initHandlers(){
         new JoinHandler();
+        new ScoreboardHandler();
     }
 
     public static function getInstance(){
