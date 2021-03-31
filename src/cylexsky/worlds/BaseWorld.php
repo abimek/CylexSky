@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace cylexsky\worlds;
 
+use cylexsky\session\SessionManager;
 use pocketmine\entity\Location;
 use pocketmine\player\Player;
 use pocketmine\world\World;
@@ -25,6 +26,7 @@ abstract class BaseWorld{
     }
 
     protected static function setSpawnPoint(Location $position){
+        self::getWorld()->setSpawnLocation($position);
         self::$position = $position;
     }
 

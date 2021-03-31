@@ -9,13 +9,16 @@ use pocketmine\entity\Location;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use pocketmine\world\World;
 
 class MainWorld extends BaseWorld{
 
     public function init()
     {
         self::setWorld(Server::getInstance()->getWorldManager()->getWorldByName(self::getName()));
-        self::setSpawnPoint(new Location(-1, 82, 11, 0, 0, self::getWorld()));
+        self::setSpawnPoint(new Location(0.5, 78, 0.5, 0, 180, self::getWorld()));
+        self::getWorld()->setTime(World::TIME_NIGHT);
+        self::getWorld()->stopTime();
     }
 
     public static function getName(): string

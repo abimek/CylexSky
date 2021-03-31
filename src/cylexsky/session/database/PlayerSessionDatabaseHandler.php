@@ -21,8 +21,23 @@ final class PlayerSessionDatabaseHandler{
     public const NULL_STRING = "\-/+-76fuwWugmJ76os,#909^%";
 
     public static function init(){
-      //  DatabaseManager::emptyQuery("DROP TABLE player_sessions");
+        DatabaseManager::emptyQuery("DROP TABLE player_sessions");
         DatabaseManager::emptyQuery("CREATE TABLE IF NOT EXISTS player_sessions(xuid VARCHAR(36) PRIMARY KEY, username TEXT, island TEXT, money TEXT, toggles TEXT, stats TEXT, level TEXT)");
+    }
+
+    public static function callableOfflineXuid(string $xuid, callable $callable){
+        if (SessionManager::getSession($xuid) !== null){
+            $callable(SessionManager::getSession($xuid));
+            return;
+        }
+        $query = new Query("SELECT * FROM player_sessions WHERE xuid=?", [$xuid], function ($result)use($callable){
+            foreach ($result as $data){
+                $session = new PlayerSession(null, $data["island"], $data["level"], $data["money"], $data["toggles"], $data["stats"]);
+                $callable($session);
+                $session->save();
+            }
+        });
+        DatabaseManager::query($query);
     }
 
     public static function createSession(PlayerObject $object){

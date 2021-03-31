@@ -5,18 +5,26 @@ namespace cylexsky\session;
 
 use core\database\DatabaseManager;
 use core\database\objects\Query;
+use core\main\text\TextFormat;
 use core\players\objects\PlayerObject;
 use cylexsky\island\Island;
 use cylexsky\island\IslandManager;
 use cylexsky\session\database\PlayerSessionDatabaseHandler;
 use cylexsky\session\modules\Level;
 use cylexsky\session\modules\Money;
+use cylexsky\session\modules\RequestModule;
 use cylexsky\session\modules\Stats;
+use cylexsky\session\modules\Teleport;
 use cylexsky\session\modules\Toggles;
+use cylexsky\utils\Glyphs;
 use pocketmine\player\Player;
 use pocketmine\Server;
 
 class PlayerSession{
+
+    public const SEND_COMMAND_NOTIFICATION_COLOR = TextFormat::RED;
+    public const NOTIFICATION_COLOR = TextFormat::RED;
+    public const GOOD_NOTIFICATION_COLOR = TextFormat::GREEN;
 
     private $object;
     private $island;
@@ -25,14 +33,23 @@ class PlayerSession{
     private $moneyModule;
     private $toggleModule;
     private $statsModule;
+    private $requestModule;
+    private $teleportModule;
 
-    public function __construct(PlayerObject $object, ?string $island, string $levelData, string $moneyData, string $toggleData, string $statsData)
+    public function __construct(?PlayerObject $object, ?string $island, string $levelData, string $moneyData, string $toggleData, string $statsData)
     {
         $this->object = $object;
-        $this->island = $island;
+        if ($island !== PlayerSessionDatabaseHandler::NULL_STRING){
+            $this->island = $island;
+        }else{
+            $this->island = null;
+        }
         $this->initModules($moneyData, $levelData, $toggleData, $statsData);
+    }
+
+    public function onJoin(){
         if ($this->getIslandObject() !== null){
-            if ($object->getUsername() === $this->getIslandObject()->getOwnerName()){
+            if ($this->getObject()->getUsername() === $this->getIslandObject()->getOwnerName()){
                 $this->getIslandObject()->ownerJoin($this);
             }
         }
@@ -47,6 +64,8 @@ class PlayerSession{
         $this->levelModule = new Level($levelData, $this);
         $this->toggleModule = new Toggles($toggleData, $this);
         $this->statsModule = new Stats($statsData, $this);
+        $this->requestModule = new RequestModule($this);
+        $this->teleportModule = new Teleport($this);
     }
 
     /**
@@ -79,6 +98,14 @@ class PlayerSession{
         return $this->statsModule;
     }
 
+    public function getRequestModule(): RequestModule{
+        return $this->requestModule;
+    }
+
+    public function getTeleportModule(): Teleport{
+        return $this->teleportModule;
+    }
+
     /**
      * @return mixed
      */
@@ -86,7 +113,6 @@ class PlayerSession{
     {
         return $this->object->getXuid();
     }
-
 
     /**
      * @return PlayerObject
@@ -104,11 +130,52 @@ class PlayerSession{
         return $this->island;
     }
 
+    /**
+     * @param string $id
+     */
+    public function setIsland(?string $id){
+        $this->island = $id;
+    }
+
+    /**
+     * @return Island|null
+     */
     public function getIslandObject(): ?Island{
         if ($this->island === null){
             return null;
         }
         return IslandManager::getIsland($this->getIsland());
+    }
+
+    public function sendNotification(string $message){
+        $player = $this->getPlayer();
+        $player->sendMessage(Glyphs::BOX_EXCLAMATION . self::NOTIFICATION_COLOR . "" . $message);
+    }
+
+    public function sendGoodNotification(string $message){
+        $player = $this->getPlayer();
+        $player->sendMessage(Glyphs::GREEN_BOX_EXCLAMATION . self::GOOD_NOTIFICATION_COLOR. " " . $message);
+    }
+
+    public function sendCommandParameters(string $command){
+        $player = $this->getPlayer();
+        $player->sendMessage(Glyphs::OPEN_BOOK . TextFormat::RED . $command);
+    }
+
+    public function sendJerryMessage(string $l1, string $l2, string $l3){
+        $player = $this->getPlayer();
+        $player->sendMessage(Glyphs::JERRY_LINE_1 . TextFormat::GRAY . $l1);
+        $player->sendMessage(Glyphs::JERRY_LINE_2 . TextFormat::GRAY . $l2);
+        $player->sendMessage(Glyphs::JERRY_LINE_3 . TextFormat::GRAY . $l3);
+    }
+
+    public function sendIslandMessage(string $message){
+        $this->sendNotification($message);
+    }
+
+    public function sendCommandNotification(string $message){
+        $player = $this->getPlayer();
+        $player->sendMessage(Glyphs::BOX_EXCLAMATION . self::SEND_COMMAND_NOTIFICATION_COLOR . "" . $message);
     }
 
     public function save(){

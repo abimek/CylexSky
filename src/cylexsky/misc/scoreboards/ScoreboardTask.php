@@ -16,19 +16,8 @@ class ScoreboardTask extends Task{
     {
         foreach (Server::getInstance()->getOnlinePlayers() as $player){
             $session = SessionManager::getSession($player->getXuid());
-            if ($session->getTogglesModule()->scoreboards()){
-                $levelName = $player->getWorld()->getFolderName();
-                switch ($levelName){
-                    case "world":
-                        ScoreboardHandler::sendSpawnScoreboard($player);
-                        return;
-                    case "pvp":
-                        ScoreboardHandler::sendPvPScoreboard($player);
-                        return;
-                    default:
-                        ScoreboardHandler::sendIslandScoreboard($player);
-                        return;
-                }
+            if ($session !== null && $session->getTogglesModule()->scoreboards()){
+                ScoreboardHandler::sendAppropriateScoreboard($session);
             }
         }
     }

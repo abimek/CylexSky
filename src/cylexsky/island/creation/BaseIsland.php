@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace cylexsky\island\creation;
 
+use cylexsky\utils\RankIds;
 use pocketmine\entity\Location;
 use pocketmine\Server;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use Ramsey\Uuid\Uuid;
 
-abstract class BaseIsland{
+abstract class BaseIsland implements RankIds{
 
     private $id;
     private $world;
@@ -27,9 +28,10 @@ abstract class BaseIsland{
     }
 
     public function createWorld(){
-        $name = Server::getInstance()->getFilePath() . "worlds" . "/" . $this->getId() . "/";
-        $this->full_copy(Server::getInstance()->getFilePath() . "worlds" . "/" . $this->getPresetName() . "/", $name);
-        $this->world = Server::getInstance()->getWorldManager()->getWorldByName("$this->id");
+        $name = Server::getInstance()->getDataPath() . "worlds" . "/" . $this->getId() . "/";
+        $this->full_copy(Server::getInstance()->getDataPath() . "worlds" . "/" . $this->getPresetName() . "/", $name);
+        Server::getInstance()->getWorldManager()->loadWorld($this->id);
+        $this->world = Server::getInstance()->getWorldManager()->getWorldByName($this->id);
         $this->world->setSpawnLocation($this->getPosition());
     }
 
@@ -39,6 +41,14 @@ abstract class BaseIsland{
 
     public function getLocation(): Location{
         return new Location(0, 0, 0, 0, 0, $this->world);
+    }
+
+    public function getJerryLocation(): Location{
+        return new Location(0, 0, 0, 0, 0, $this->world);
+    }
+
+    public function getRequiredRank(): int {
+        return self::ROOKIE;
     }
 
     public function getWorld(): World{

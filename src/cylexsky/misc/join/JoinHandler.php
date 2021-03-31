@@ -5,6 +5,8 @@ namespace cylexsky\misc\join;
 
 use core\main\text\TextFormat;
 use cylexsky\CylexSky;
+use cylexsky\island\creation\IslandCreationHandler;
+use cylexsky\island\creation\types\NormalIsland;
 use cylexsky\session\SessionManager;
 use cylexsky\utils\Glyphs;
 use cylexsky\utils\Sounds;
@@ -13,6 +15,7 @@ use pocketmine\entity\animation\TotemUseAnimation;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\player\Player;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 
 class JoinHandler{
@@ -26,23 +29,29 @@ class JoinHandler{
         MainWorld::teleport($player);
         self::sendJoinMessages($player);
         self::sendJoinSound($player);
+        $session = SessionManager::getSession($player->getXuid());
+        $session->onJoin();
     }
 
     public static function initialJoin(Player $player){
         MainWorld::teleport($player);
         self::sendTotemAnimation($player);
-        $player->sendMessage(Glyphs::LEXY_LINE_1 . TextFormat::GRAY . "Welcome to " . TextFormat::BOLD_GOLD . "Cylex" . TextFormat::AQUA . "Sky!");
-        $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "My name is" . TextFormat::AQUA . " Lexy! " . TextFormat::GRAY . " And I'm");
-        $player->sendMessage(Glyphs::LEXY_LINE_3 . TextFormat::GRAY . "your guide through the server!");
+        CylexSky::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
+            $player->sendMessage(Glyphs::LEXY_LINE_1 . TextFormat::GRAY . "Welcome to " . TextFormat::BOLD_GOLD . "Cylex" . TextFormat::AQUA . "Sky!");
+            $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "My name is" . TextFormat::AQUA . " Lexy! " . TextFormat::GRAY . " And I'm");
+            $player->sendMessage(Glyphs::LEXY_LINE_3 . TextFormat::GRAY . "your guide through the server!");
+        }), 15);
     }
 
     public static function sendJoinMessages(Player $player){
         $session = SessionManager::getSession($player->getXuid());
         self::sendTotemAnimation($player);
         if ($session !== null && $session->getTogglesModule()->joinMessage()){
-            $player->sendMessage(Glyphs::LEXY_LINE_1 . TextFormat::GRAY . "Welcome back " . TextFormat::BOLD_GOLD . "Cylex" . TextFormat::AQUA . "Sky!");
-            $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "An " . TextFormat::RED . "exciting" . TextFormat::GRAY . " journey awaits!");
-            $player->sendMessage(Glyphs::LEXY_LINE_3 . TextFormat::GRAY);
+            CylexSky::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($player): void{
+                $player->sendMessage(Glyphs::LEXY_LINE_1 . TextFormat::GRAY . "Welcome back " . TextFormat::BOLD_GOLD . "Cylex" . TextFormat::AQUA . "Sky!");
+                $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "An " . TextFormat::RED . "exciting" . TextFormat::GRAY . " journey awaits!");
+                $player->sendMessage(Glyphs::LEXY_LINE_3 . TextFormat::GRAY);
+            }), 15);
         }
     }
 

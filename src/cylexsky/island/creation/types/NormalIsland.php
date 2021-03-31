@@ -17,11 +17,21 @@ class NormalIsland extends BaseIsland implements IslandTypes, PresetLocations {
     }
 
     public function getPosition(): Position{
-        return new Position(30, 30, 30, $this->getWorld());
+        return new Position(0, 74, 0, $this->getWorld());
     }
 
     public function getLocation(): Location
     {
-        return new Location(30, 30, 30, 0, 0, $this->getWorld());
+        return new Location(0, 74, 0, 0, 0, $this->getWorld());
+    }
+
+    public function getJerryLocation(): Location
+    {
+        return new Location(0, 74, 0, 0, 0, $this->getWorld());
+    }
+
+    public function getRequiredRank(): int
+    {
+        return self::ROOKIE;
     }
 }

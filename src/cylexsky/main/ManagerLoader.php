@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace cylexsky\main;
 
+use cylexsky\commands\CommandManager;
 use cylexsky\island\IslandManager;
 use cylexsky\misc\MiscManager;
 use cylexsky\session\SessionManager;
@@ -12,6 +13,7 @@ use Exception;
 final class ManagerLoader{
 
     public const MANAGERS = [
+        CommandManager::class,
         WorldManager::class,
         MiscManager::class,
         SessionManager::class,
