@@ -32,7 +32,7 @@ class DeleteCommand extends BaseSubCommand{
             return;
         }
         if ($session->getIslandObject()->getOwner() !== $sender->getXuid()){
-            $session->sendNotification("Only island " . TextFormat::GOLD . "owners " . TextFormat::RED . "have permission to delete islands!");
+            $session->sendNotification("Only island " . TextFormat::GOLD . "owners " . TextFormat::GRAY . "have permission to delete islands!");
             return;
         }
         $form = new ModalForm(function (Player $player, ?bool $value){
@@ -41,11 +41,15 @@ class DeleteCommand extends BaseSubCommand{
                 $session->sendGoodNotification("Successfully " . TextFormat::RED . "aborted " . TextFormat::GREEN . "deleting your island!");
                 return;
             }
+            if ($session->getIslandObject() === null){
+                $session->sendNotification("You are not in an island!");
+                return;
+            }
             IslandManager::deleteIsland($session->getIsland());
             $session->sendGoodNotification("Successfully " . TextFormat::RED . "deleted " . TextFormat::GREEN . "your island!");
         });
         $form->setTitle(Glyphs::BOX_EXCLAMATION . TextFormat::BOLD_RED . "Delete Confirmation" . Glyphs::BOX_EXCLAMATION);
-        $form->setContent(Glyphs::RIGHT_ARROW . TextFormat::RED . "Are you sure you want to " . TextFormat::BOLD_RED . "delete" . TextFormat::RESET_RED . "your island?");
+        $form->setContent(Glyphs::RIGHT_ARROW . TextFormat::GRAY . "Are you sure you want to " . TextFormat::BOLD_RED . "delete " . TextFormat::RESET_GRAY . "your island?");
         $form->setButton1(Glyphs::CHECK_MARK . "Yes");
         $form->setButton2(Glyphs::X_MARK . "No");
         $sender->sendForm($form);

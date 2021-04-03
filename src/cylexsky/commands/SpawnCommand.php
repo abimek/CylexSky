@@ -36,7 +36,7 @@ class SpawnCommand extends Command{
         MainWorld::teleport($sender);
         $player = $sender;
         $player->sendMessage(Glyphs::LEXY_LINE_1 . TextFormat::GRAY . "Welcome back to spawn!");
-        $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "Today seems like a wonderful business day!");
+        $player->sendMessage(Glyphs::LEXY_LINE_2 . TextFormat::GRAY . "Today is an amazing day!");
         $player->sendMessage(Glyphs::LEXY_LINE_3 . TextFormat::GRAY);
     }
 

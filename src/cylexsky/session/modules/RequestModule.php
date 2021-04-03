@@ -11,11 +11,12 @@ use pocketmine\scheduler\ClosureTask;
 
 class RequestModule{
 
-    public const TPA_REQUEST_TIMER = 15;
-    public const ISLAND_INVITE_TIMER = 15;
+    public const TPA_REQUEST_TIMER = 30;
+    public const ISLAND_INVITE_TIMER = 30;
 
     public $islandInvites = [];
     public $tpaRequests = [];
+    private $trustedRequests = [];
 
     private $session;
 
@@ -34,13 +35,45 @@ class RequestModule{
 
     public function inviteToIsland(PlayerSession $session){
         $name = $session->getObject()->getUsername();
-        var_dump($name . " << NAME");
+        $name2 = $this->getSession()->getObject()->getUsername();
         if (!isset($this->islandInvites[$name])){
             $this->getSession()->sendNotification("You've been invited to " . $session->getIslandObject()->getOwnerName() . "'s Island!");
             $this->islandInvites[$name] = $session->getIslandObject();
-            CylexSky::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($name): void {
+            CylexSky::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($name, $session, $name2): void {
+                if (!$this->isIslandRequested($name)){
+                    return;
+                }
+                if ($session->getPlayer() !== null){
+                    $session->sendNotification("The island invite you sent to " . TextFormat::AQUA . $name2 . TextFormat::GRAY . " has expired!");
+                }
                 if ($this !== null){
+                    if ($this->getSession()->getPlayer() !== null){
+                        $this->getSession()->sendNotification("Island invitation from" . TextFormat::AQUA . $name .  TextFormat::GRAY . " has expired!");
+                    }
                     $this->removeIslandRequest($name);
+                }
+            }), 20 * self::ISLAND_INVITE_TIMER);
+        }
+    }
+
+    public function inviteToIslandAsTrusted(PlayerSession $session){
+        $name = $session->getObject()->getUsername();
+        $name2 = $this->getSession()->getObject()->getUsername();
+        if (!isset($this->islandInvites[$name])){
+            $this->getSession()->sendNotification("You've been invited to " . TextFormat::AQUA . $session->getIslandObject()->getOwnerName() .TextFormat::GRAY .  "'s Island as trusted!");
+            $this->trustedRequests[$name] = $session->getIslandObject();
+            CylexSky::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($name, $session, $name2): void {
+                if (!$this->isIslandTrustedRequested($name)){
+                    return;
+                }
+                if ($session !== null){
+                    $session->sendNotification("The island trusted invite you sent to " . TextFormat::AQUA . $name2 . TextFormat::GRAY . " has expired!");
+                }
+                if ($this !== null){
+                    if ($this->getSession()->getPlayer() !== null){
+                        $this->getSession()->sendNotification("Island " . TextFormat::GOLD . "trusted " . TextFormat::GRAY . "invitation from" . TextFormat::AQUA . $name .  TextFormat::GRAY . " has expired!");
+                    }
+                    $this->removeIslandTrustedRequest($name);
                 }
             }), 20 * self::ISLAND_INVITE_TIMER);
         }
@@ -52,8 +85,18 @@ class RequestModule{
         }
     }
 
+    public function removeIslandTrustedRequest(string $name){
+        if (isset($this->trustedRequests[$name])){
+            unset($this->trustedRequests[$name]);
+        }
+    }
+
     public function isIslandRequested(string $name){
         return isset($this->islandInvites[$name]);
+    }
+
+    public function isIslandTrustedRequested(string $name){
+        return isset($this->trustedRequests[$name]);
     }
 
     public function getIsland(string $name): ?Island{
@@ -62,18 +105,32 @@ class RequestModule{
         return $this->islandInvites[$name];
     }
 
+    public function getTrustedInvite(string $name): ?Island{
+        if (!$this->isIslandTrustedRequested($name)){
+            return null;
+        }
+        return $this->trustedRequests[$name];
+    }
+
     public function tpaRequest(PlayerSession $session){
         $name = $session->getPlayer()->getName();
         $thisName = $this->getSession()->getPlayer()->getName();
         if (!isset($this->tpaRequests[$name])){
             $this->tpaRequests[$name] = $session;
             CylexSky::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function ()use($name, $session, $thisName): void {
+                if (!$this->isTpaRequest($name)){
+                    return;
+                }
                 $this->removeTpaRequest($name);
                 if ($session->getPlayer() !== null){
-                    $session->sendNotification($thisName . TextFormat::GRAY . " failed to accept your TpaRequest!");
+                    $session->sendNotification(TextFormat::RED . $thisName . TextFormat::GRAY . " failed to accept your TpaRequest!");
                 }
             }), 20 * self::TPA_REQUEST_TIMER);
         }
+    }
+
+    public function isTpaRequest(string $name): bool {
+        return isset($this->tpaRequests[$name]);
     }
 
     public function removeTpaRequest(string $name){

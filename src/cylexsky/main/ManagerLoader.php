@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace cylexsky\main;
 
+use core\main\managers\Manager;
 use cylexsky\commands\CommandManager;
 use cylexsky\island\IslandManager;
 use cylexsky\misc\MiscManager;
@@ -31,5 +32,13 @@ final class ManagerLoader{
                 return null;
             }
             }, self::MANAGERS);
+    }
+
+    public static function close(){
+        foreach (self::$managers as $manager){
+            if ($manager instanceof Manager){
+                $manager->disable();
+            }
+        }
     }
 }

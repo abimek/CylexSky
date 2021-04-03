@@ -52,8 +52,13 @@ class DemoteCommand extends BaseSubCommand{
                 $session->sendCommandNotification("The player " . TextFormat::GOLD . $name . PlayerSession::SEND_COMMAND_NOTIFICATION_COLOR . " is already a member!");
                 return;
             }
+            if ($island->getMembersModule()->isCoOwnerUsername($name)){
+                $session->sendGoodNotification("Successfully demoted " . TextFormat::GOLD . $name . PlayerSession::GOOD_NOTIFICATION_COLOR . " to officer!");
+            }
+            if ($island->getMembersModule()->isOfficerUsername($name)){
+                $session->sendGoodNotification("Successfully demoted " . TextFormat::GOLD . $name . PlayerSession::GOOD_NOTIFICATION_COLOR . " to member!");
+            }
             $island->getMembersModule()->demoteName($name);
-            $session->sendGoodNotification("Successfully demoted " . TextFormat::GOLD . $name . PlayerSession::GOOD_NOTIFICATION_COLOR . " to member!");
             return;
         }else{
             $session->sendNotification("Only island " . TextFormat::GOLD . "owners " . TextFormat::RED . "can do this command!");

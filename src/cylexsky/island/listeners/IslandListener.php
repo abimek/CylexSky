@@ -8,6 +8,7 @@ use cylexsky\island\IslandManager;
 use cylexsky\island\modules\PermissionModule;
 use cylexsky\island\modules\SettingsModule;
 use cylexsky\session\SessionManager;
+use cylexsky\utils\Glyphs;
 use cylexsky\worlds\WorldManager;
 use pocketmine\block\tile\Container;
 use pocketmine\event\block\BlockBreakEvent;
@@ -63,7 +64,7 @@ class IslandListener implements Listener{
         $session = SessionManager::getSession($entity->getXuid());
         if ($event->getCause() === EntityDamageEvent::CAUSE_VOID){
             $event->cancel();
-            $session->sendNotification("Getting a little " . TextFormat::GOLD . "too" . TextFormat::RED . " close to the void!");
+            $session->getPlayer()->sendMessage(Glyphs::SKULL . TextFormat::GRAY . "Fell into the " . TextFormat::RED . "void");
             $is->teleportPlayer($entity);
             return;
         }
@@ -74,7 +75,7 @@ class IslandListener implements Listener{
     }
 
     public function blockBreak(BlockBreakEvent $event){
-        if (in_array($event->getEntity()->getWorld()->getFolderName(), WorldManager::getWorldNames())){
+        if (in_array($event->getPlayer()->getWorld()->getFolderName(), WorldManager::getWorldNames())){
             return;
         }
         $player = $event->getPlayer();
@@ -90,7 +91,7 @@ class IslandListener implements Listener{
     }
 
     public function blockPlace(BlockPlaceEvent $event){
-        if (in_array($event->getEntity()->getWorld()->getFolderName(), WorldManager::getWorldNames())){
+        if (in_array($event->getPlayer()->getWorld()->getFolderName(), WorldManager::getWorldNames())){
             return;
         }
         $player = $event->getPlayer();
@@ -106,7 +107,7 @@ class IslandListener implements Listener{
     }
 
     public function interactInventory(PlayerInteractEvent $event){
-        if (in_array($event->getEntity()->getWorld()->getFolderName(), WorldManager::getWorldNames())){
+        if (in_array($event->getPlayer()->getWorld()->getFolderName(), WorldManager::getWorldNames())){
             return;
         }
         if (!$event->getPlayer()->getWorld()->getTile($event->getBlock()->getPos()) instanceof Container){
@@ -129,8 +130,8 @@ class IslandListener implements Listener{
         if (in_array($event->getEntity()->getWorld()->getFolderName(), WorldManager::getWorldNames())){
             return;
         }
-        $player = $event->getPlayer();
-        $is = IslandManager::getIsland($player->getWorld()->getFolderName());
+        $entity = $event->getEntity();
+        $is = IslandManager::getIsland($entity->getWorld()->getFolderName());
         if ($is === null){
             return;
         }

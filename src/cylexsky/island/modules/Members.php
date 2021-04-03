@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace cylexsky\island\modules;
 
-use core\database\objects\Query;
 use core\main\text\TextFormat;
 use cylexsky\session\database\PlayerSessionDatabaseHandler;
 use cylexsky\session\PlayerSession;
@@ -17,7 +16,8 @@ class Members extends BaseModule{
     public const GUEST = 0;
     public const MEMBER = 1;
     public const OFFICER = 2;
-    public const OWNER = 3;
+    public const COOWNER = 3;
+    public const OWNER = 4;
 
     private $memberLimit = 3;
 
@@ -28,8 +28,11 @@ class Members extends BaseModule{
     {
         $this->memberLimit = $data[0];
         $this->members = $data[1];
+        foreach ($this->members as $xuid => $data){
+            $this->members[strval($xuid)] = $data;
+        }
         foreach ($this->members as $member => $data){
-            $this->membersByName[$data[0]] = [$member, $data[1]];
+            $this->membersByName[$data[0]] = [strval($member), $data[1]];
         }
     }
 
@@ -46,7 +49,8 @@ class Members extends BaseModule{
     }
 
     public function addToMemberLimit(int $amount){
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         if ($amount + $this->memberLimit > self::MAX_LIMIT){
             $this->memberLimit = self::MAX_LIMIT;
         }else{
@@ -56,6 +60,36 @@ class Members extends BaseModule{
 
     public function getMemberCount(): int {
         return count($this->members);
+    }
+
+    public function getOnlyMemebers(): array {
+        $members = [];
+        foreach ($this->members as $xuid => $data){
+            if ($data[1] === self::MEMBER){
+                $members[] = $data[0];
+            }
+        }
+        return $members;
+    }
+
+    public function getOnlyOfficers(): array {
+        $members = [];
+        foreach ($this->members as $xuid => $data){
+            if ($data[1] === self::OFFICER){
+                $members[] = $data[0];
+            }
+        }
+        return $members;
+    }
+
+    public function getOnlyCoOwners(): array {
+        $members = [];
+        foreach ($this->members as $xuid => $data){
+            if ($data[1] === self::COOWNER){
+                $members[] = $data[0];
+            }
+        }
+        return $members;
     }
 
     public function isMemberXUID(string $xuid){
@@ -90,6 +124,20 @@ class Members extends BaseModule{
         return false;
     }
 
+    public function isCoOwner(string $xuid): bool {
+        if ($this->isMemberXUID($xuid) && $this->members[$xuid][1] === self::COOWNER){
+            return true;
+        }
+        return false;
+    }
+
+    public function isCoOwnerUsername(string $username): bool {
+        if ($this->isMemberUsername($username) && $this->membersByName[$username][1] === self::COOWNER){
+            return true;
+        }
+        return false;
+    }
+
     public function isMemberLimitReached(): bool {
         return (count($this->members) >= $this->getMemberLimit());
     }
@@ -99,9 +147,9 @@ class Members extends BaseModule{
     }
 
     public function addMember(PlayerSession $session, string $name, string $xuid): bool {
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         if (count($this->members) >= $this->getMemberLimit()){
-            $session->sendNotification("Island is full!");
+            $session->sendNotification(TextFormat::RED . "Island is full!");
             return false;
         }
         $session->sendGoodNotification("Successfully joined island!");
@@ -110,49 +158,94 @@ class Members extends BaseModule{
         $this->membersByName[$name] = [$xuid, self::MEMBER];
         foreach ($this->getOnlineMembers() as $member){
             $session = SessionManager::getSession($member->getXuid());
-            $session->sendGoodNotification("$name " . TextFormat::GRAY . "joined the island!");
+            $session->sendGoodNotification(TextFormat::AQUA . "$name " . TextFormat::GRAY . "joined the island!");
         }
         return true;
     }
 
+    public function remove(string $name){
+        if (isset($this->membersByName[$name])){
+            $xuid = $this->nameToXuid($name);
+            unset($this->membersByName[$name]);
+            unset($this->members[$xuid]);
+        }
+    }
+
     public function promote(string $xuid){
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         if (isset($this->members[$xuid])){
-            $this->members[$xuid][1] = self::OFFICER;
-            $this->membersByName[$this->members[$xuid][0]][1] = self::OFFICER;
-            foreach ($this->getOnlineMembers() as $member){
-                $session = SessionManager::getSession($member->getXuid());
-                $session->sendGoodNotification($this->members[$xuid][0] . " " . TextFormat::GRAY . "was promoted to officer!");
+            if ($this->members[$xuid][1] === self::MEMBER){
+                $this->members[$xuid][1] = self::OFFICER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::OFFICER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendGoodNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was promoted to officer!");
+                }
+                return;
+            }
+            if ($this->members[$xuid][1] === self::OFFICER){
+                $this->members[$xuid][1] = self::COOWNER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::COOWNER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendGoodNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was promoted to CoOwner!");
+                }
+                return;
             }
         }
     }
 
     public function promoteName(string $name){
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         if (isset($this->membersByName[$name])){
-            $this->membersByName[$name][1] = self::OFFICER;
-            $this->members[$this->membersByName[$name][0]][1] = self::OFFICER;
-            foreach ($this->getOnlineMembers() as $member){
-                $session = SessionManager::getSession($member->getXuid());
-                $session->sendGoodNotification($name . " " . TextFormat::GRAY . "was promoted to officer!");
+            $xuid = $this->nameToXuid($name);
+            if ($this->members[$xuid][1] === self::MEMBER){
+                $this->members[$xuid][1] = self::OFFICER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::OFFICER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendGoodNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was promoted to officer!");
+                }
+                return;
+            }
+            if ($this->members[$xuid][1] === self::OFFICER){
+                $this->members[$xuid][1] = self::COOWNER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::COOWNER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendGoodNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was promoted to CoOwner!");
+                }
+                return;
             }
         }
     }
 
     public function demote(string $xuid){
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         if (isset($this->members[$xuid])){
-            $this->members[$xuid][1] = self::MEMBER;
-            $this->membersByName[$this->members[$xuid][0]][1] = self::MEMBER;
-            foreach ($this->getOnlineMembers() as $member){
-                $session = SessionManager::getSession($member->getXuid());
-                $session->sendNotification($this->members[$xuid][0] . " " . TextFormat::GRAY . "was demoted to member!");
+            if ($this->members[$xuid][1] === self::OFFICER){
+                $this->members[$xuid][1] = self::MEMBER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::MEMBER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was demoted to member!");
+                }
+                return;
+            }
+            if ($this->members[$xuid][1] === self::COOWNER){
+                $this->members[$xuid][1] = self::OFFICER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::OFFICER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was demoted to officer!");
+                }
+                return;
             }
         }
     }
 
     public function kick(string $name, bool $left = false){
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         if ($this->isMemberUsername($name)){
             $xuid = $this->nameToXuid($name);
             unset($this->membersByName[$name]);
@@ -173,29 +266,42 @@ class Members extends BaseModule{
             foreach ($this->getOnlineMembers() as $member){
                 $session = SessionManager::getSession($member->getXuid());
                 if ($left){
-                    $s->sendGoodNotification($name . " " . TextFormat::GRAY . "successfully left the island!");
+                    $s->sendGoodNotification(TextFormat::RED . $name . " " . TextFormat::GRAY . "successfully left the island!");
                 }else {
-                    $session->sendNotification($name . " " . TextFormat::GRAY . "was kicked from the island!");
+                    $session->sendNotification(TextFormat::RED . $name . " " . TextFormat::GRAY . "was kicked from the island!");
                 }
             }
         }
     }
 
     public function demoteName(string $name){
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         if (isset($this->membersByName[$name])){
-            $this->membersByName[$name][1] = self::MEMBER;
-            $this->members[$this->membersByName[$name][0]][1] = self::MEMBER;
-            foreach ($this->getOnlineMembers() as $member){
-                $session = SessionManager::getSession($member->getXuid());
-                $session->sendNotification($name . " " . TextFormat::GRAY . "was demoted to member!");
+            $xuid = $this->nameToXuid($name);
+            if ($this->members[$xuid][1] === self::OFFICER){
+                $this->members[$xuid][1] = self::MEMBER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::MEMBER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was demoted to member!");
+                }
+                return;
+            }
+            if ($this->members[$xuid][1] === self::COOWNER){
+                $this->members[$xuid][1] = self::OFFICER;
+                $this->membersByName[$this->members[$xuid][0]][1] = self::OFFICER;
+                foreach ($this->getOnlineMembers() as $member){
+                    $session = SessionManager::getSession($member->getXuid());
+                    $session->sendNotification(TextFormat::RED . $this->members[$xuid][0] . " " . TextFormat::GRAY . "was demoted to officer!");
+                }
+                return;
             }
         }
     }
 
     public function nameToXuid(string $name): ?string {
         if (isset($this->membersByName[$name])){
-            return $this->membersByName[$name][0];
+            return strval($this->membersByName[$name][0]);
         }
         return null;
     }

@@ -10,7 +10,7 @@ use cylexsky\session\database\PlayerSessionDatabaseHandler;
 
 class SessionManager extends Manager{
 
-    private static $sessions;
+    private static $sessions = [];
 
     protected function init(): void
     {

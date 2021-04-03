@@ -16,6 +16,7 @@ use cylexsky\session\modules\RequestModule;
 use cylexsky\session\modules\Stats;
 use cylexsky\session\modules\Teleport;
 use cylexsky\session\modules\Toggles;
+use cylexsky\session\modules\Trusted;
 use cylexsky\utils\Glyphs;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -23,11 +24,12 @@ use pocketmine\Server;
 class PlayerSession{
 
     public const SEND_COMMAND_NOTIFICATION_COLOR = TextFormat::RED;
-    public const NOTIFICATION_COLOR = TextFormat::RED;
+    public const NOTIFICATION_COLOR = TextFormat::GRAY;
     public const GOOD_NOTIFICATION_COLOR = TextFormat::GREEN;
 
     private $object;
     private $island;
+    private $xuid;
 
     private $levelModule;
     private $moneyModule;
@@ -35,16 +37,18 @@ class PlayerSession{
     private $statsModule;
     private $requestModule;
     private $teleportModule;
+    private $trustedModule;
 
-    public function __construct(?PlayerObject $object, ?string $island, string $levelData, string $moneyData, string $toggleData, string $statsData)
+    public function __construct(?PlayerObject $object, string $xuid, ?string $island, string $levelData, string $moneyData, string $toggleData, string $statsData, string $trustedData)
     {
+        $this->xuid = $xuid;
         $this->object = $object;
         if ($island !== PlayerSessionDatabaseHandler::NULL_STRING){
             $this->island = $island;
         }else{
             $this->island = null;
         }
-        $this->initModules($moneyData, $levelData, $toggleData, $statsData);
+        $this->initModules($moneyData, $levelData, $toggleData, $statsData, $trustedData);
     }
 
     public function onJoin(){
@@ -59,13 +63,14 @@ class PlayerSession{
         return Server::getInstance()->getPlayerExact($this->getObject()->getUsername());
     }
 
-    private function initModules(string $moneyData, string $levelData, string $toggleData, string $statsData){
+    private function initModules(string $moneyData, string $levelData, string $toggleData, string $statsData, string $trustedData){
         $this->moneyModule = new Money($moneyData, $this);
         $this->levelModule = new Level($levelData, $this);
         $this->toggleModule = new Toggles($toggleData, $this);
         $this->statsModule = new Stats($statsData, $this);
         $this->requestModule = new RequestModule($this);
         $this->teleportModule = new Teleport($this);
+        $this->trustedModule = new Trusted($trustedData, $this);
     }
 
     /**
@@ -106,12 +111,16 @@ class PlayerSession{
         return $this->teleportModule;
     }
 
+    public function  getTrustedModule(): Trusted{
+        return $this->trustedModule;
+    }
+
     /**
      * @return mixed
      */
     public function getXuid()
     {
-        return $this->object->getXuid();
+        return $this->xuid;
     }
 
     /**
@@ -179,13 +188,26 @@ class PlayerSession{
     }
 
     public function save(){
-        DatabaseManager::emptyQuery("UPDATE player_sessions SET username=?, island=?, level=?, money=?, toggles=?, stats=? WHERE xuid=?", Query::SERVER_DB, [
+        DatabaseManager::emptyQuery("UPDATE player_sessions SET username=?, island=?, level=?, money=?, toggles=?, stats=?, trusted=? WHERE xuid=?", Query::SERVER_DB, [
             $this->getObject()->getUsername(),
             ($this->getIsland() === null) ? PlayerSessionDatabaseHandler::NULL_STRING : $this->getIsland(),
             $this->getLevelModule()->save(),
             $this->getMoneyModule()->save(),
             $this->getTogglesModule()->save(),
             $this->getStatsModule()->save(),
+            $this->getTrustedModule()->save(),
+            $this->getXuid()
+        ]);
+    }
+
+    public function saveOffline(){
+        DatabaseManager::emptyQuery("UPDATE player_sessions SET island=?, level=?, money=?, toggles=?, stats=?, trusted=? WHERE xuid=?", Query::SERVER_DB, [
+            ($this->getIsland() === null) ? PlayerSessionDatabaseHandler::NULL_STRING : $this->getIsland(),
+            $this->getLevelModule()->save(),
+            $this->getMoneyModule()->save(),
+            $this->getTogglesModule()->save(),
+            $this->getStatsModule()->save(),
+            $this->getTrustedModule()->save(),
             $this->getXuid()
         ]);
     }

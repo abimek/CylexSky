@@ -40,7 +40,7 @@ class Jerry extends Human{
 
     public function saveNBT(): CompoundTag{
         $nbt = parent::saveNBT();
-        $nbt->setString(self::ISLAND_ID, $this->getIslandId());
+   //     $nbt->setString(self::ISLAND_ID, $this->getIslandId());
         return $nbt;
     }
     public function setIslandId(string $id){

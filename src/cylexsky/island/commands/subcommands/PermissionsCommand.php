@@ -10,7 +10,9 @@ use cylexsky\ui\island\IslandUIHandler;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class InviteCommand extends BaseSubCommand{
+class PermissionsCommand extends BaseSubCommand{
+
+    public const USAGE = "/is settings";
 
     /**
      * This is where all the arguments, permissions, sub-commands, etc would be registered
@@ -29,10 +31,14 @@ class InviteCommand extends BaseSubCommand{
             $session->sendNotification("You're not in an island!");
             return;
         }
-        if ($session->getIslandObject()->getMembersModule()->isMemberLimitReached()){
-            $session->sendNotification("Island member limit reached, " . TextFormat::GOLD . "upgrade " . TextFormat::GRAY . "your island to unlock more slots!");
+        $island = $session->getIslandObject();
+        if ($island->getOwnerName() === $session->getObject()->getUsername() || $island->getMembersModule()->isCoOwnerUsername($sender->getName())){
+            IslandUIHandler::sendPermissionSelectUI($session);
+            return;
+        }else{
+            $session->sendNotification("Only island " . TextFormat::GOLD . "owners and coowners " . TextFormat::GRAY . "can do this command!");
             return;
         }
-        IslandUIHandler::sendInviteUI($session);
+
     }
 }

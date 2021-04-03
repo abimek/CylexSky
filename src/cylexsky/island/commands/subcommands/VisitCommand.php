@@ -32,10 +32,6 @@ class VisitCommand extends BaseSubCommand{
             $session->sendCommandParameters("/is visit (player)");
             return;
         }
-        if ($session->getIsland() !== null){
-            $session->sendNotification("You're already in an island!");
-            return;
-        }
         $name = $args["name"];
         if (Server::getInstance()->getPlayerByPrefix($name) === null){
             $session->sendNotification(TextFormat::GRAY . $name . " " . TextFormat::RED . "isn't online!");
@@ -43,7 +39,7 @@ class VisitCommand extends BaseSubCommand{
         }
         $s = SessionManager::getSession(Server::getInstance()->getPlayerByPrefix($name)->getXuid());
         if($s->getIslandObject() === null){
-            $session->sendNotification(TextFormat::GRAY . $name . TextFormat::RED . " is not in an island!");
+            $session->sendNotification(TextFormat::GRAY . $name . TextFormat::GRAY . " is not in an island!");
             return;
         }
         if($s->getIslandObject()->getSettingsModule()->getSetting(SettingsModule::VISITING) === false){
@@ -56,6 +52,6 @@ class VisitCommand extends BaseSubCommand{
         }
         $island = $session->getRequestModule()->getIsland($name);
         $island->teleportPlayer($sender);
-        $session->sendGoodNotification("Teleporting to " . TextFormat::GOLD . $name . "'s " . TextFormat::GRAY . "island...");
+        $session->sendGoodNotification("Teleporting to " . TextFormat::GOLD . $name . "'s " . TextFormat::GREEN . "island...");
     }
 }

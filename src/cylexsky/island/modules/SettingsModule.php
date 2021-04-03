@@ -3,17 +3,29 @@ declare(strict_types=1);
 
 namespace cylexsky\island\modules;
 
+use cylexsky\session\SessionManager;
+
 class SettingsModule extends BaseModule{
 
     public const PVP = 0;
     public const VISITING = 1;
     public const EXPLOSIONS = 2;
 
+    public const INT_TO_NAME = [
+        self::PVP => "Island PvP",
+        self::VISITING => "Island Visiting",
+        self::EXPLOSIONS => "Island Explosions"
+    ];
+
     private $settings;
 
     public function init(array $data)
     {
         $this->settings = $data;
+    }
+
+    public function getSettings(): array {
+        return $this->settings;
     }
 
     public function getSetting(int $setting): ?bool {
@@ -27,7 +39,7 @@ class SettingsModule extends BaseModule{
     }
 
     public function setSettings(array $settings): void {
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         foreach ($settings as $k => $v){
             $this->setSetting($k, $v);
         }
@@ -36,11 +48,20 @@ class SettingsModule extends BaseModule{
     public function setSetting(int $setting, bool $value): void {
         if ($setting === self::PVP && $value === true){
             $this->setSetting(self::VISITING, false);
+            if ($this->getIsland()->getWorld() !== null){
+                foreach ($this->getIsland()->getWorld()->getPlayers() as $player){
+                    $xuid = $player->getXuid();
+                    if ($xuid !== $this->getIsland()->getOwner() && !$this->getIsland()->getMembersModule()->isMemberXUID($xuid)){
+                        $session = SessionManager::getSession($player->getXuid());
+                        $session->sendNotification("The island you are currently on just enabled pvp!");
+                    }
+                }
+            }
         }
         if ($setting === self::VISITING && $value === true && $this->getSetting(self::PVP) === true){
             $this->setSetting(self::PVP, false);
         }
-        $this->getIsland()->hasBeenChanged();
+        $this->getIsland()->setHasBeenChanged();
         $this->settings[$setting] = $value;
     }
 

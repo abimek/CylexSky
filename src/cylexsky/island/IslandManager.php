@@ -15,6 +15,7 @@ use cylexsky\island\listeners\IslandListener;
 use cylexsky\island\listeners\JerryListener;
 use cylexsky\island\tasks\IslandSaveTask;
 use cylexsky\session\database\PlayerSessionDatabaseHandler;
+use cylexsky\session\PlayerSession;
 use cylexsky\session\SessionManager;
 use cylexsky\worlds\worlds\MainWorld;
 use InvalidArgumentException;
@@ -86,7 +87,16 @@ class IslandManager extends Manager{
             PlayerSessionDatabaseHandler::NULL_STRING,
             $xuid
         ]);
-
+        foreach ($is->getTrustedModule()->getOnlineTrusted() as $player){
+            $s = SessionManager::getSession($is->getOwner());
+            $s->getTrustedModule()->removeTrustedIsland($is->getId());
+            $s->sendNotification(TextFormat::GOLD . $is->getOwnerName() . TextFormat::RED . " deleted their island!");
+        }
+        foreach ($is->getTrustedModule()->getOfflineTrustedXuids() as $xuid){
+            PlayerSessionDatabaseHandler::callableOfflineXuid($xuid, function (PlayerSession $session)use($xuid){
+                $session->getTrustedModule()->removeTrustedIsland($xuid);
+            });
+        }
     }
 
     public static function deleteWorld(World $world){
@@ -115,6 +125,7 @@ class IslandManager extends Manager{
 
     protected function close(): void
     {
+        var_dump("TSTST");
         self::saveIslandData();
     }
 }

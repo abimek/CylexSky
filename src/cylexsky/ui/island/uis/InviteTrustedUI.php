@@ -12,7 +12,7 @@ use cylexsky\utils\Glyphs;
 use pocketmine\player\Player;
 use pocketmine\Server;
 
-class InviteUI extends CustomForm{
+class InviteTrustedUI extends CustomForm{
 
     private $session;
 
@@ -22,7 +22,7 @@ class InviteUI extends CustomForm{
     {
         $this->session = $session;
         parent::__construct($this->getFormResultCallable());
-        $this->setTitle(Glyphs::SWORD . TextFormat::BOLD_YELLOW . "Island Invitations" . Glyphs::SWORD);
+        $this->setTitle(Glyphs::SWORD . TextFormat::BOLD_YELLOW . "Island Trusted Invitations" . Glyphs::SWORD);
         if ($session->getIslandObject() === null){
             $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::RED . "You are not a member of an island!");
             return;
@@ -31,15 +31,15 @@ class InviteUI extends CustomForm{
             $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::RED . "You are currently in tutorial mode, finsih the tutorial to gain the ability to add memebers to your island!");
             return;
         }
-        if ($session->getIslandObject()->getMembersModule()->isMemberLimitReached()){
-            $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::RED . "Member limit reached, you can " . TextFormat::GOLD . "upgrade " . TextFormat::GRAY . "the member limit through island progression!");
+        if ($session->getIslandObject()->getTrustedModule()->isTrustedLimitReached()){
+            $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::RED . "Trusted limit reached, you can " . TextFormat::GOLD . "upgrade " . TextFormat::GRAY . "the trusted limit through island progression!");
             return;
         }
         $island = $session->getIslandObject();
         if ($session->getIslandObject()->getPermissionModule()->playerHasPermission(PermissionModule::PERMISSION_INVITE, $session)){
             $this->canInvite = true;
-            $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Invite someone to " . TextFormat::GOLD . $session->getIslandObject()->getOwnerName() . "'s " . TextFormat::GRAY . "island!");
-            $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::YELLOW . $island->getMembersModule()->getMemberCount() . "/" . TextFormat::RED . $island->getMembersModule()->getMemberLimit() . TextFormat::GRAY . " members in your island!");
+            $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Invite someone to " . TextFormat::GOLD . $session->getIslandObject()->getOwnerName() . "'s " . TextFormat::GRAY . "island as trusted!");
+            $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::YELLOW . $island->getTrustedModule()->getTrustedCount() . "/" . TextFormat::RED . $island->getTrustedModule()->getTrustedLimit() . TextFormat::GRAY . " trusteds in your island!");
             $this->addInput(Glyphs::OPEN_BOOK . TextFormat::GRAY . "Player Name");
         }
     }
@@ -61,17 +61,29 @@ class InviteUI extends CustomForm{
                 return;
             }
             $session = $this->session;
-            if ($session->getIslandObject()->getMembersModule()->isMemberLimitReached()){
-                $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::RED . "Member limit reached, you can " . TextFormat::GOLD . "upgrade " . TextFormat::GRAY . "the member limit through island progression!");
+            if ($session->getIslandObject() === null){
+                $session->sendNotification("You are not in an island!");
+                return;
+            }
+            if ($session->getIslandObject()->getTrustedModule()->isTrustedLimitReached()){
+                $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::RED . "Trusted limit reached, you can " . TextFormat::GOLD . "upgrade " . TextFormat::GRAY . "the trusted limit through island progression!");
                 return;
             }
             $session2 = SessionManager::getSession($p2->getXuid());
-            if ($session2->getIslandObject() !== null){
-                $this->session->sendNotification("The player " . TextFormat::AQUA . $name . TextFormat::GRAY. " is already in an island!");
+            if ($session->getIslandObject()->getMembersModule()->isMemberUsername($name)){
+                $session->sendNotification($name . " is a memeber of the island!");
                 return;
             }
-            $session2->getRequestModule()->inviteToIsland($this->session);
-            $this->session->sendGoodNotification("Successfully invited " . TextFormat::AQUA . $name . TextFormat::GREEN . " to your island!");
+            if ($session2->getTrustedModule()->isTrustedIsland($session->getIsland())){
+                $this->session->sendNotification("The player " . $name . " is already trusted in the island!");
+                return;
+            }
+            if ($session2->getTrustedModule()->isTrustedLimitReached()){
+                $session->sendNotification(TextFormat::RED . $name . " has reached their trusted island limit");
+                return;
+            }
+            $session2->getRequestModule()->inviteToIslandAsTrusted($this->session);
+            $this->session->sendGoodNotification("Successfully invited " . TextFormat::AQUA . $name . TextFormat::GREEN . " to your island as trusted!");
         };
     }
 }

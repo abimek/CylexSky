@@ -5,12 +5,14 @@ namespace cylexsky\island\commands\subcommands;
 
 use core\main\text\TextFormat;
 use CortexPE\Commando\BaseSubCommand;
+use cylexsky\island\modules\SettingsModule;
 use cylexsky\session\SessionManager;
-use cylexsky\ui\island\IslandUIHandler;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class InviteCommand extends BaseSubCommand{
+class UnLockCommand extends BaseSubCommand{
+
+    public const USAGE = "/is unlock";
 
     /**
      * This is where all the arguments, permissions, sub-commands, etc would be registered
@@ -29,10 +31,14 @@ class InviteCommand extends BaseSubCommand{
             $session->sendNotification("You're not in an island!");
             return;
         }
-        if ($session->getIslandObject()->getMembersModule()->isMemberLimitReached()){
-            $session->sendNotification("Island member limit reached, " . TextFormat::GOLD . "upgrade " . TextFormat::GRAY . "your island to unlock more slots!");
+        $island = $session->getIslandObject();
+        if ($island->getOwnerName() === $session->getObject()->getUsername()){
+            $island->getSettingsModule()->setSetting(SettingsModule::VISITING, true);
+            $session->sendGoodNotification("Successfully " . TextFormat::RED . "unlocked " . TextFormat::GREEN ."island visiting!");
+            return;
+        }else{
+            $session->sendNotification("Only island " . TextFormat::GOLD . "owners " . TextFormat::GRAY . "can do this command!");
             return;
         }
-        IslandUIHandler::sendInviteUI($session);
     }
 }

@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace cylexsky\island\commands\subcommands;
 
-use core\main\text\TextFormat;
 use CortexPE\Commando\BaseSubCommand;
 use cylexsky\session\SessionManager;
 use cylexsky\ui\island\IslandUIHandler;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class InviteCommand extends BaseSubCommand{
+class TrustedCommand extends BaseSubCommand{
 
     /**
      * This is where all the arguments, permissions, sub-commands, etc would be registered
@@ -25,14 +24,10 @@ class InviteCommand extends BaseSubCommand{
             return;
         }
         $session = SessionManager::getSession($sender->getXuid());
-        if ($session->getIsland() === null){
-            $session->sendNotification("You're not in an island!");
+        if ($session->getTrustedModule()->getTrustedCount()  === 0){
+            $session->sendNotification("You're not trusted on any islands!");
             return;
         }
-        if ($session->getIslandObject()->getMembersModule()->isMemberLimitReached()){
-            $session->sendNotification("Island member limit reached, " . TextFormat::GOLD . "upgrade " . TextFormat::GRAY . "your island to unlock more slots!");
-            return;
-        }
-        IslandUIHandler::sendInviteUI($session);
+        IslandUIHandler::sendIslandTrustedSelectForm($session);
     }
 }

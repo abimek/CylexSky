@@ -36,7 +36,7 @@ class AcceptCommand extends BaseSubCommand{
         }
         $name = $args["name"];
         if (!$session->getRequestModule()->isIslandRequested($name)){
-            $session->sendNotification("You have not received an island invite from " . TextFormat::GOLD . $name . TextFormat::RED . "!");
+            $session->sendNotification("You have not received an island invite from " . TextFormat::GOLD . $name . TextFormat::GRAY . "!");
             return;
         }
         $island = $session->getRequestModule()->getIsland($name);

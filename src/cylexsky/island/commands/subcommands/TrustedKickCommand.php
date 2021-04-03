@@ -6,14 +6,15 @@ namespace cylexsky\island\commands\subcommands;
 use core\main\text\TextFormat;
 use CortexPE\Commando\args\TextArgument;
 use CortexPE\Commando\BaseSubCommand;
+use cylexsky\island\modules\PermissionModule;
 use cylexsky\session\PlayerSession;
 use cylexsky\session\SessionManager;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class PromoteCommand extends BaseSubCommand{
+class TrustedKickCommand extends BaseSubCommand{
 
-    public const USAGE = "/is promote <name>";
+    public const USAGE = "/is trustedkick <name>";
 
     /**
      * This is where all the arguments, permissions, sub-commands, etc would be registered
@@ -34,33 +35,34 @@ class PromoteCommand extends BaseSubCommand{
             return;
         }
         $name = $args["name"];
+        self::kick($sender, $name);
+    }
+
+    public static function kick(Player $sender, string $name){
+        $session = SessionManager::getSession($sender->getXuid());
         if ($session->getIsland() === null){
             $session->sendNotification("You're not in an island!");
             return;
         }
         $island = $session->getIslandObject();
-        if ($island->getOwnerName() === $session->getObject()->getUsername()){
+        if ($island->getPermissionModule()->playerHasPermission(PermissionModule::PERMISSION_KICK, $session)){
             if($island->getOwnerName() === $name){
-                $session->sendNotification("You can't promote the owner of the island!");
+                $session->sendNotification("You can't kick the owner of the island!");
                 return;
             }
-            if (!$island->getMembersModule()->isMemberUsername($name)){
-                $session->sendCommandNotification("The player " . TextFormat::GOLD . $name . PlayerSession::SEND_COMMAND_NOTIFICATION_COLOR . " is not a member of your island!");
+            if (!$island->getTrustedModule()->isTrustedName($name)){
+                $session->sendCommandNotification("The player " . TextFormat::GOLD . $name . PlayerSession::SEND_COMMAND_NOTIFICATION_COLOR . " is not a trusted!");
                 return;
             }
-            if($island->getMembersModule()->isOfficerUsername($name)){
-                $session->sendGoodNotification("Successfully promoted " . TextFormat::GOLD . $name . PlayerSession::GOOD_NOTIFICATION_COLOR . " to CoOwner!");
-            }
-            if ($island->getMembersModule()->isCoOwnerUsername($name)){
-                $session->sendCommandParameters("The player is already CoOwner!");
+            if ($island->getTrustedModule()->isTrusted($sender->getXuid())){
+                $session->sendNotification("Trusted cant kick trusted silly!");
                 return;
             }
-            $island->getMembersModule()->promoteName($name);
+            $island->getTrustedModule()->kick($name);
             return;
         }else{
-            $session->sendNotification("Only island " . TextFormat::GOLD . "owners " . TextFormat::GRAY . "can do this command!");
+            $session->sendNotification("You do not have permission to kick a trusted from your island!");
             return;
         }
-
     }
 }

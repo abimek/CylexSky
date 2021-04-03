@@ -5,6 +5,8 @@ namespace cylexsky\session\modules;
 
 use core\main\text\TextFormat;
 use cylexsky\utils\Glyphs;
+use cylexsky\utils\Sounds;
+use cylexsky\utils\Utils;
 
 class Level extends BaseModule {
 
@@ -30,13 +32,22 @@ class Level extends BaseModule {
     private function addLevel(){
         $this->xp = 0;
         $previousLevel = $this->level;
+        $romanPreviousLevel = Utils::numberToRomanRepresentation($previousLevel);
         $this->level++;
+        $l = Utils::numberToRomanRepresentation($this->level);
+        $this->getSession()->getPlayer()->sendMessage(TextFormat::BOLD_AQUA . "+++++++++++++++++++++++");
+        $this->getSession()->getPlayer()->sendMessage(TextFormat::BOLD_AQUA . " Player Level Up" . TextFormat::RESET_GRAY . $romanPreviousLevel . Glyphs::RIGHT_ARROW . TextFormat::AQUA . $l);
+        $this->getSession()->getPlayer()->sendMessage(TextFormat::WHITE . " Rewards:");
         if ($this->level % 5 === 0){
-            $this->getSession()->getMoneyModule()->addOpal($this->getLevel());
-            $this->getSession()->getMoneyModule()->addMoney($this->getLevel() * 3);
+            $this->getSession()->getMoneyModule()->addOpal($this->getLevel(), false);
+            $this->getSession()->getPlayer()->sendMessage("  " . Glyphs::OPAL . TextFormat::GRAY . ": " . TextFormat::GOLD . $this->getLevel());
         }
+        Sounds::sendSoundPlayer($this->getSession()->getPlayer(), Sounds::LEVEL_UP_SOUND);
+        $this->getSession()->getMoneyModule()->addMoney($this->getLevel() * 25, false);
+        $this->getSession()->getPlayer()->sendMessage("  " . Glyphs::GOLD_COIN . TextFormat::GRAY . ": " . TextFormat::GOLD . $this->getLevel() * 25);
+        $this->getSession()->getPlayer()->sendMessage(TextFormat::BOLD_AQUA . "+++++++++++++++++++++++");
         $this->getSession()->getPlayer()->sendPopup(Glyphs::GOLD_MEDAL . TextFormat::GOLD . "You've leveled up!" . Glyphs::GOLD_MEDAL);
-        $this->getSession()->getPlayer()->sendSubTitle(Glyphs::SPARKLE . TextFormat::RED . $previousLevel . " " . TextFormat::GRAY . Glyphs::RIGHT_ARROW .  " " .$this->level . Glyphs::SPARKLE);
+        $this->getSession()->getPlayer()->sendSubTitle(Glyphs::SPARKLE . TextFormat::BOLD_GREEN . $romanPreviousLevel . " " . TextFormat::BOLD_GOLD . Glyphs::RIGHT_ARROW .  " " .$l . Glyphs::SPARKLE);
     }
 
     public function calculateLevel(){
@@ -47,7 +58,7 @@ class Level extends BaseModule {
     }
 
     public function getXpForNextLevel(){
-        return floor(pow($this->level, 1.4) * 60);
+        return floor(pow($this->level, 2.8) * 20);
     }
 
     public function addXp(int $amount){
