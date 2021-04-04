@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace cylexsky\ui\island\uis\trusted;
 
-use core\forms\formapi\SimpleForm;
+use core\forms\formapi\CustomForm;
 use core\main\text\TextFormat;
-use cylexsky\island\commands\subcommands\TrustedKickCommand;
+use cylexsky\island\modules\PermissionModule;
 use cylexsky\session\PlayerSession;
-use cylexsky\ui\island\IslandUIHandler;
 use cylexsky\utils\Glyphs;
 use pocketmine\player\Player;
 
-class ManageTrustedUI extends SimpleForm{
+class TrustedIslandPermissions extends CustomForm {
 
     private $xuid;
     private $name;
     private $session;
+    private $datums;
 
     public function __construct(PlayerSession $session, string $xuid)
     {
@@ -25,14 +25,18 @@ class ManageTrustedUI extends SimpleForm{
         $name = $session->getIslandObject()->getTrustedModule()->xuidToName($xuid);
         $this->name = $name;
         $this->setTitle(TextFormat::GOLD . $name);
-        $this->addButton(TextFormat::BOLD_GREEN . "Permissions");
-        $this->addButton(TextFormat::BOLD_RED . "Kick");
-        $this->addButton(TextFormat::RED . "Back");
+        $this->addLabel(Glyphs::BOX_EXCLAMATION . TextFormat::GOLD . $name . "'s " . TextFormat::GRAY . "Permissions!");
+        $perms = $session->getIslandObject()->getPermissionModule()->getTrustedPermission($xuid);
+        $this->datums = $perms;
+        foreach ($perms as $int => $value){
+            $permName = PermissionModule::POSSIBLE_PERMISSIONS[$int];
+            $this->addToggle(TextFormat::GRAY . $permName, $value);
+        }
     }
 
     public function getFormResultCallable(): callable
     {
-        return function (Player $player, ?int $data){
+        return function (Player $player, ?array $data = null){
             if ($data === null){
                 return;
             }
@@ -50,17 +54,13 @@ class ManageTrustedUI extends SimpleForm{
                 $session->sendNotification(TextFormat::GOLD . $this->name . TextFormat::GRAY . " is nolonger trusted on your island!");
                 return;
             }
-            switch ($data){
-                case 0:
-                    IslandUIHandler::sendTrustedIslandPermissions($session, $this->xuid);
-                    return;
-                case 1:
-                    TrustedKickCommand::kick($player, $this->name);
-                    return;
-                default:
-                    IslandUIHandler::sendTrustedMemberList($session);
-                    return;
+            array_shift($data);
+            $stuff = [];
+            foreach ($this->datums as $int => $datum){
+                $stuff[$int] = $data[count($stuff)];
             }
+            $this->session->getIslandObject()->getPermissionModule()->setTrustedPermission($this->xuid, $stuff);
+            $this->session->sendGoodNotification("Successfully updated " . TextFormat::GOLD . $this->name . "'s " . TextFormat::GREEN . " permissions!");
         };
     }
 }

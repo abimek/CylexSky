@@ -50,7 +50,11 @@ class VisitCommand extends BaseSubCommand{
             $session->sendNotification("Unable to teleport!");
             return;
         }
-        $island = $session->getRequestModule()->getIsland($name);
+        if ($name = $sender->getName()){
+            $session->sendNotification("You to teleport to your own island silly!");
+            return;
+        }
+        $island = $s->getIslandObject();
         $island->teleportPlayer($sender);
         $session->sendGoodNotification("Teleporting to " . TextFormat::GOLD . $name . "'s " . TextFormat::GREEN . "island...");
     }

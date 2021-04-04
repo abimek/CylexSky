@@ -26,6 +26,10 @@ class Toggles extends BaseModule{
         }
     }
 
+    public function setToggles(array $data){
+        $this->data = $data;
+    }
+
     public static function getBaseData(): array
     {
         return [

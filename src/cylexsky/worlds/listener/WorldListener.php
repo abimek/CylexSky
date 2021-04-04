@@ -5,11 +5,13 @@ namespace cylexsky\worlds\listener;
 
 use cylexsky\worlds\worlds\MainWorld;
 use cylexsky\worlds\worlds\PvPWorld;
+use pocketmine\block\Stair;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
+use pocketmine\event\inventory\CraftItemEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\player\Player;
@@ -24,7 +26,7 @@ class WorldListener implements Listener{
             $event->cancel();
             return;
         }
-        if ($world->getFolderName() === "world" && $event instanceof EntityDamageByEntityEvent){
+        if ($world->getFolderName() === "world" ){
             $event->cancel();
             return;
         }
@@ -58,6 +60,18 @@ class WorldListener implements Listener{
         $world = $event->getPlayer()->getWorld();
         if ($world->getFolderName() === "world" || $world->getFolderName() === "pvp"){
             $event->cancel();
+        }
+    }
+
+
+    //TODO REMOVE BECAUSE THIS IS FOR TESTING
+    public function craft(CraftItemEvent $event){
+        var_dump($event->getOutputs());
+        foreach ($event->getOutputs() as $output){
+            var_dump($output);
+            if ($output instanceof Stair){
+                $event->cancel();
+            }
         }
     }
     

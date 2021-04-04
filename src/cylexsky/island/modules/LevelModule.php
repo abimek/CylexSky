@@ -36,6 +36,10 @@ class LevelModule extends BaseModule{
         return  $this->xp;
     }
 
+    public function getPrestige(){
+        return $this->prestige;
+    }
+
     public function prestige(){
         $p = Utils::numberToRomanRepresentation($this->prestige);
         if (!$this->hasEnoughPrestigeShardsToPrestige()){
@@ -121,6 +125,10 @@ class LevelModule extends BaseModule{
             return false;
         }
         return ($this->getPrestigeShardsForNextLevel() <= $this->getIsland()->getPrestigeShards());
+    }
+
+    public function getNextPrestigeLevel(){
+        return $this->prestige + 1 * 10;
     }
 
     public function getPrestigeShardsForNextLevel(): int {

@@ -25,7 +25,7 @@ class IslandTrustedSelectorForm extends SimpleForm{
         $this->setTitle(Glyphs::RIGHT_ARROW . TextFormat::BOLD_AQUA . "Trusted Islands" . Glyphs::LEFT_ARROW);
         if ($session->getTrustedModule()->getTrustedCount() === 0){
             $this->cancel = true;
-            $this->setContent(Glyphs::BOX_EXCLAMATION . "You're not trusted on any islands!");
+            $this->setContent(Glyphs::BOX_EXCLAMATION . "There are no trusteds on your island!");
             return;
         }
         foreach ($session->getTrustedModule()->getTrustedIslands() as $island){

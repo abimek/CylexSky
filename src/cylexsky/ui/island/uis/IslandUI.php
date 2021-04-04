@@ -21,8 +21,9 @@ class IslandUI extends SimpleForm{
         $this->session = $session;
         $this->setTitle(Glyphs::SPARKLE . TextFormat::BOLD_GOLD . "Island UI" . Glyphs::SPARKLE);
         $this->addButton(Glyphs::ISLAND_ICON . TextFormat::BOLD_GREEN . "Teleport to Island!");
-        $this->addButton( TextFormat::RED . "Island Level" );
+        $this->addButton( TextFormat::RED . "Prestige" );
         $this->addButton( TextFormat::RED . "Skills" );
+        $this->addButton(TextFormat::RED . "Info");
         $this->addButton(TextFormat::RED . "Members");
         $this->addButton( TextFormat::RED . "Challenges/Quests" );
         $this->addButton( TextFormat::RED . "Boosters" );
@@ -57,15 +58,18 @@ class IslandUI extends SimpleForm{
                     //TODO SEND UI
                     return;
                 case 3:
-                    MembersCommand::sendMembersInUI($player);
+                    IslandUIHandler::sendIslandInfoForm($session);
                     return;
                 case 4:
-                    //TODO SEND UI
+                    MembersCommand::sendMembersInUI($player);
                     return;
                 case 5:
                     //TODO SEND UI
                     return;
                 case 6:
+                    //TODO UI
+                    return;
+                case 7:
                     if ($player->getXuid() !== $session->getIslandObject()->getOwner() && !$session->getIslandObject()->getMembersModule()->isCoOwner($player->getXuid())){
                         $session->sendNotification("Only island " . TextFormat::GOLD . "owners and coowners" . TextFormat::GRAY . " can manage the island!");
                         return;

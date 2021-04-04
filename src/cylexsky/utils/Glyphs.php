@@ -10,6 +10,8 @@ interface Glyphs{
     public const SWORD = "";
     public const SKULL = "";
 
+    public const BELLS = "";
+
     public const OPAL = "";
 
     public const OPEN_BOOK = "obook";
@@ -31,7 +33,9 @@ interface Glyphs{
 
     //LEXY FAVE GLYPHS
 
-    public const LEXY_LINE_1 = "";
+    public const PRESTIGE_SHARDS = "s";
+
+    public const LEXY_LINE_1 = "sss";
     public const LEXY_LINE_2 = "sss";
     public const LEXY_LINE_3 = "sss";
 
