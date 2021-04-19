@@ -12,3 +12,18 @@ FileJsonParser::create(string $directory, [requirements])
     $properties = $data[“properties”]; 
     };
 ```
+
+```php
+new FileJsonParser(string $directory, [])
+  ->onMainRequirementNotMet(string $identifier)
+  ->addParseComponent(ComponentParser::getForParsing("nameIdentifier", $name, $identifier), )
+  ->addParseComponent(ComponentParser::getFor(“properties”), [new Requirement(“flags.properties”, Requirement::TYPE_BOOL, true])
+  ->addParseComponent(ComponentParser::get(“item”))
+  ->addIterativeParseComponent("conversations", ComponentParser::get("content", $contentParser), [new Requirement("conversations")])
+  ->onComplete(function($data){ 
+    $name = $data["nameIdentifier"]["name"];
+    $identfier = $data["nameIdentifier"]["identifier"];
+    $item = $data[“item”];
+    $properties = $data[“properties”]; 
+    };
+```
