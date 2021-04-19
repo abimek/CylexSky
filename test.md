@@ -4,6 +4,7 @@ FileJsonParser::parse(string $directory, [requirements])
   ->addParseComponent(ComponentParser::getForParsing("nameIdentifier", $name, $identifier), )
   ->addParseComponent(ComponentParser::getFor(“properties”), [new            Requirement(“flags.properties”, Requirement::TYPE_BOOL, true])
   ->addParseComponent(ComponentParser::get(“item”))
+  ->addIterativeParseComponent("conversations", ComponentParser::get("content", $contentParser), [new Requirement("conversations")])
   ->onComplete(function($data){ 
     $name = $data["nameIdentifier"]["name"];
     $identfier = $data["nameIdentifier"]["identifier"];
