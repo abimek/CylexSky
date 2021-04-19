@@ -1,5 +1,5 @@
 ```php
-FileJsonParser::parse(string $directory, [requirements])
+FileJsonParser::create(string $directory, [requirements])
   ->onMainRequirementNotMet(string $identifier)
   ->addParseComponent(ComponentParser::getForParsing("nameIdentifier", $name, $identifier), )
   ->addParseComponent(ComponentParser::getFor(“properties”), [new Requirement(“flags.properties”, Requirement::TYPE_BOOL, true])
