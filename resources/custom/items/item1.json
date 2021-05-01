@@ -1,0 +1,31 @@
+{
+  "identifier": "cylexsky:titans_shroud",
+  "type": "armor",
+  "name": "titans_shroud",
+  "parameters": {
+    "defencePoints": 5,
+    "maxDurability": 500,
+    "armorSlot": 0
+  },
+  "flags": {
+    "custom": true,
+    "creativeInventory": true
+  },
+  "data": {
+    "texture": "titans_shroud",
+    "max_stack_size": 1,
+    "properties": {
+      "allow_off_hand": true,
+      "hand_held": true
+    },
+    "components": {
+      "minecraft:armor": {
+        "protection": 8
+      },
+      "minecraft:wearable": {
+        "slot": "slot.armor.head",
+        "dispensable": true
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "platinum": {
+    "harvest_level": 6,
+    "max_durability": 2000,
+    "base_attack_points": 9,
+    "base_efficiency": 10
+  }
+}
