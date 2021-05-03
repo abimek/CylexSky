@@ -6,7 +6,10 @@ namespace cylexsky\island;
 use core\database\DatabaseManager;
 use core\database\objects\Query;
 use core\main\data\formatter\JsonFormatter;
+use core\main\data\skin_data\SkinImageParser;
 use core\main\text\TextFormat;
+use cylexsky\CylexSky;
+use cylexsky\island\entities\James;
 use cylexsky\island\modules\LevelModule;
 use cylexsky\island\modules\Members;
 use cylexsky\island\modules\PermissionModule;
@@ -21,9 +24,11 @@ use cylexsky\session\PlayerSession;
 use cylexsky\session\SessionManager;
 use cylexsky\worlds\worlds\MainWorld;
 use pocketmine\entity\Location;
+use pocketmine\entity\Skin;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use pocketmine\world\Position;
 use pocketmine\world\World;
 
 class Island{
@@ -201,6 +206,19 @@ class Island{
 
     public function getPrestigePoints(): int {
         return $this->prestigePoints;
+    }
+
+    public function moveJames(Location $location){
+        if($this->getWorld() !== null){
+            foreach ($this->getWorld()->getEntities() as $entity){
+                if ($entity instanceof James){
+                    $entity->flagForDespawn();
+                    $entity = new James($location, new Skin("jerry", SkinImageParser::fromImage(imagecreatefrompng(CylexSky::getInstance()->getDataFolder() . "EntitySkins/james.png"))));
+                    $entity->spawnToAll();
+                    $entity->teleport($location, $location->pitch, $location->yaw);
+                }
+            }
+        }
     }
 
     public function transferOwnership(Player $player){

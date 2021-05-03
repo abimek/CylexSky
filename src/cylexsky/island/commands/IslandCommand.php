@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace cylexsky\island\commands;
 
 use CortexPE\Commando\args\BaseArgument;
-use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseCommand;
 use cylexsky\island\commands\subcommands\AcceptCommand;
 use cylexsky\island\commands\subcommands\AddPrestigePoints;
@@ -22,6 +21,7 @@ use cylexsky\island\commands\subcommands\LeaveCommand;
 use cylexsky\island\commands\subcommands\LockCommand;
 use cylexsky\island\commands\subcommands\MakeOwnerCommand;
 use cylexsky\island\commands\subcommands\MembersCommand;
+use cylexsky\island\commands\subcommands\MoveJamesCommand;
 use cylexsky\island\commands\subcommands\PermissionsCommand;
 use cylexsky\island\commands\subcommands\PromoteCommand;
 use cylexsky\island\commands\subcommands\RestartCommand;
@@ -79,6 +79,7 @@ class IslandCommand extends BaseCommand{
         $this->registerSubCommand(new GivePrestigeShards("addprestigeshards"));
         $this->registerSubCommand(new RestartCommand("reset"));
         $this->registerSubCommand(new TopCommand("top"));
+        $this->registerSubCommand(new MoveJamesCommand("movejames"));
      //   $this->registerArgument(0, new RawStringArgument("help"));
     }
 

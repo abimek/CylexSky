@@ -43,7 +43,7 @@ abstract class BaseIsland implements RankIds{
         return new Location(0, 0, 0, 0, 0, $this->world);
     }
 
-    public function getJerryLocation(): Location{
+    public function getJamesLocation(): Location{
         return new Location(0, 0, 0, 0, 0, $this->world);
     }
 

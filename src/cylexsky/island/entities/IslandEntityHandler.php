@@ -15,8 +15,8 @@ use pocketmine\world\World;
 class IslandEntityHandler{
 
     public static function init(){
-        EntityFactory::getInstance()->register(Jerry::class, function (World $world, CompoundTag $nbt): Jerry {
-            return new Jerry(EntityDataHelper::parseLocation($nbt, $world),  new Skin("jerry", SkinImageParser::fromImage(imagecreatefrompng(CylexSky::getInstance()->getDataFolder() . "/EntitySkins/jerry.png"))));
-        }, ["cylex:jerry"], EntityLegacyIds::PLAYER);
+        EntityFactory::getInstance()->register(James::class, function (World $world, CompoundTag $nbt): James {
+            return new James(EntityDataHelper::parseLocation($nbt, $world),  new Skin("james", SkinImageParser::fromImage(imagecreatefrompng(CylexSky::getInstance()->getDataFolder() . "/EntitySkins/james.png"))));
+        }, ["cylex:james"], EntityLegacyIds::PLAYER);
     }
 }

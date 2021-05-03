@@ -21,7 +21,7 @@ class IslandCreationHandler implements IslandTypes, RankIds {
         if ($session->getIsland() !== null){
             return;
         }
-        IslandDatabaseHandler::createIsland($session, $island->getId(), $island->getId(), $session->getXuid(), $session->getObject()->getUsername(), $island->getJerryLocation());
+        IslandDatabaseHandler::createIsland($session, $island->getId(), $island->getId(), $session->getXuid(), $session->getObject()->getUsername(), $island->getJamesLocation());
 }
 
     public static function getTypes(): array {

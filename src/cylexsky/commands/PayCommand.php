@@ -62,6 +62,7 @@ class PayCommand extends Command{
         }
         EconomyManager::getInstance()->addMoney($player, intval($args[1]), true);
         $s->getMoneyModule()->removeMoney(intval($args[1]),true);
+        $s->sendNotification("Payed " . intval($args[1]) . Glyphs::GOLD_COIN . " to " .  $player);
     }
 
 }

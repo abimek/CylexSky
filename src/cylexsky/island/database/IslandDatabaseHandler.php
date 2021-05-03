@@ -8,7 +8,7 @@ use core\database\objects\Query;
 use core\main\data\formatter\JsonFormatter;
 use core\main\data\skin_data\SkinImageParser;
 use cylexsky\CylexSky;
-use cylexsky\island\entities\Jerry;
+use cylexsky\island\entities\James;
 use cylexsky\island\Island;
 use cylexsky\island\IslandManager;
 use cylexsky\island\modules\LevelModule;
@@ -84,7 +84,7 @@ final class IslandDatabaseHandler{
             IslandManager::createIsland($is);
             Server::getInstance()->getWorldManager()->loadWorld($world);
             $is->getWorld()->loadChunk($location->getX() >> 4, $location->getZ() >> 4);
-            $entity = new Jerry($location, new Skin("jerry", SkinImageParser::fromImage(imagecreatefrompng(CylexSky::getInstance()->getDataFolder() . "EntitySkins/jerry.png"))));
+            $entity = new James($location, new Skin("jerry", SkinImageParser::fromImage(imagecreatefrompng(CylexSky::getInstance()->getDataFolder() . "EntitySkins/james.png"))));
             $entity->spawnToAll();
             $entity->setIslandId($id);
             $session->setIsland($id);
