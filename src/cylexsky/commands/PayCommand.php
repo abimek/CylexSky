@@ -54,15 +54,16 @@ class PayCommand extends Command{
             return;
         }
         if ($p instanceof Player){
-            $s->getMoneyModule()->removeMoney(intval($args[1]),true);
+            $s->getMoneyModule()->removeMoney(intval($args[1]));
             $session = SessionManager::getSession($p->getXuid());
             $session->getMoneyModule()->addMoney(intval($args[1]));
+            $s->sendNotification("Payed " . intval($args[1]) . Glyphs::GOLD_COIN . " to " .  TextFormat::GOLD . $args[0]);
             $session->sendGoodNotification(TextFormat::GOLD . $sender->getName() . TextFormat::GRAY . " payed you " . TextFormat::GOLD . $args[1] . Glyphs::OPAL);
             return;
         }
-        EconomyManager::getInstance()->addMoney($player, intval($args[1]), true);
+        EconomyManager::getInstance()->addMoney($player, intval($args[1]));
         $s->getMoneyModule()->removeMoney(intval($args[1]),true);
-        $s->sendNotification("Payed " . intval($args[1]) . Glyphs::GOLD_COIN . " to " .  $player);
+        $s->sendNotification("Payed " . intval($args[1]) . Glyphs::GOLD_COIN . " to " .  TextFormat::GOLD . $player);
     }
 
 }

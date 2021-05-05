@@ -24,7 +24,7 @@ class WarpCreateUI extends CustomForm{
             $this->addLabel(Glyphs::BOX_EXCLAMATION .  TextFormat::GRAY . " You are not in an island!");
             return;
         }
-        if ($session->getPlayer()->getWorld()->getDisplayName() !== $session->getIslandObject()->getId()){
+        if ($session->getPlayer()->getWorld()->getFolderName() !== $session->getIsland()){
             $this->cancel = true;
             $this->addLabel(Glyphs::BOX_EXCLAMATION .  TextFormat::GRAY . " You must be in your island to add a warp!");
             return;

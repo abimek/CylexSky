@@ -21,7 +21,8 @@ class TogglesUI extends CustomForm{
         $toggles = $session->getTogglesModule()->getToggles();
         $this->addLabel(Glyphs::BUBBLE_MESSAGE . TextFormat::AQUA . "Lexy: " . TextFormat::GRAY . "Toggles allow you to customize your game experience!");
         foreach ($toggles as $key => $value){
-            $this->addToggle(TextFormat::GRAY . Toggles::TOGGLE_NAMES[$key], $value);
+            ($value) ? $color = TextFormat::GREEN : $color = TextFormat::GRAY;
+            $this->addToggle($color . Toggles::TOGGLE_NAMES[$key], $value);
         }
     }
 

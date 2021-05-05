@@ -9,7 +9,7 @@ use core\main\data\formatter\JsonFormatter;
 use core\main\data\skin_data\SkinImageParser;
 use core\main\text\TextFormat;
 use cylexsky\CylexSky;
-use cylexsky\island\entities\James;
+use cylexsky\island\entities\Henry;
 use cylexsky\island\modules\LevelModule;
 use cylexsky\island\modules\Members;
 use cylexsky\island\modules\PermissionModule;
@@ -208,14 +208,14 @@ class Island{
         return $this->prestigePoints;
     }
 
-    public function moveJames(Location $location){
+    public function moveHenry(Location $location){
         if($this->getWorld() !== null){
             foreach ($this->getWorld()->getEntities() as $entity){
-                if ($entity instanceof James){
+                if ($entity instanceof Henry){
                     $entity->flagForDespawn();
-                    $entity = new James($location, new Skin("jerry", SkinImageParser::fromImage(imagecreatefrompng(CylexSky::getInstance()->getDataFolder() . "EntitySkins/james.png"))));
-                    $entity->spawnToAll();
+                    $entity = new Henry($location, new Skin("henry", SkinImageParser::fromImage(imagecreatefrompng(CylexSky::getInstance()->getDataFolder() . "EntitySkins/henry.png")), "", "geometry.henry", file_get_contents(CylexSky::getInstance()->getDataFolder() . "EntitySkins/geometries/henry.json")));
                     $entity->teleport($location, $location->pitch, $location->yaw);
+                    $entity->spawnToAll();
                 }
             }
         }

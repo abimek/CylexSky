@@ -33,7 +33,7 @@ class MoveJamesCommand extends BaseSubCommand{
         $island = $session->getIslandObject();
         if ($island->getOwnerName() === $session->getObject()->getUsername() || $island->getMembersModule()->isCoOwnerUsername($sender->getName())){
             $location = $sender->getLocation();
-            $island->moveJames($location);
+            $island->moveHenry($location);
         }else{
             $session->sendNotification("Only island " . TextFormat::GOLD . "owners and coowners " . TextFormat::GRAY . "can do this command!");
         }

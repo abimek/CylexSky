@@ -34,6 +34,7 @@ class MiscModule{
     }
 
     public function toggleIslandChat(){
+        $this->getSession()->sendNotification("Toggled Island Chat!");
         $this->islandChat = !$this->islandChat;
     }
 
@@ -61,16 +62,16 @@ class MiscModule{
             return;
         }
         $this->fly = true;
-        $this->session->getPlayer()->setAllowFlight(false);
-        $this->session->getPlayer()->setFlying(false);
+        if($this->session->getPlayer()->getAllowFlight()){ $this->session->getPlayer()->setAllowFlight(false);}
+        if($this->session->getPlayer()->isFlying()){$this->session->getPlayer()->setFlying(false);}
         $this->session->sendNotification(TextFormat::RED . "Flight Disabled!");
     }
 
     public function enableFly(){
         if ($this->fly) return;
         $this->fly = true;
-        $this->session->getPlayer()->setAllowFlight(true);
-        $this->session->getPlayer()->setFlying(true);
+        if(!$this->session->getPlayer()->getAllowFlight()){ $this->session->getPlayer()->setAllowFlight(true);}
+        if(!$this->session->getPlayer()->isFlying()){$this->session->getPlayer()->setFlying(true);}
         $this->session->sendGoodNotification("Flight Enabled!");
     }
 

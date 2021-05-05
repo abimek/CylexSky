@@ -6,8 +6,10 @@ namespace cylexsky\ui\island;
 use core\forms\formapi\Form;
 use cylexsky\island\Island;
 use cylexsky\session\PlayerSession;
+use cylexsky\ui\InventoryUI;
 use cylexsky\ui\island\uis\InviteTrustedUI;
 use cylexsky\ui\island\uis\InviteUI;
+use cylexsky\ui\island\uis\InvUis\InvIslandUi;
 use cylexsky\ui\island\uis\IslandCreationForm;
 use cylexsky\ui\island\uis\IslandInfoUI;
 use cylexsky\ui\island\uis\IslandUI;
@@ -100,7 +102,12 @@ class IslandUIHandler{
     }
 
     public static function sendIslandUI(PlayerSession $session){
-        self::sendUI($session, new IslandUI($session));
+        var_dump($session->getUiType());
+        if ($session->getUiType() === PlayerSession::UI_INV){
+            self::sendUI($session, new InvIslandUi($session->getPlayer()));
+        }else {
+            self::sendUI($session, new IslandUI($session));
+        }
     }
 
     public static function sendManagementUI(PlayerSession $session){
@@ -123,9 +130,13 @@ class IslandUIHandler{
         self::sendUI($session, new PermissionUI($type, $session));
     }
 
-
-    public static function sendUI(PlayerSession $session, Form $form){
-        $session->getPlayer()->sendForm($form);
+    public static function sendUI(PlayerSession $session, $form){
+        if ($form instanceof Form){
+            $session->getPlayer()->sendForm($form);
+        }
+        if ($form instanceof InventoryUI){
+            $form->send(true);
+        }
     }
 
 }

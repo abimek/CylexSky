@@ -120,7 +120,7 @@ interface Glyphs{
     //king emojis
     public const KISS_EMOJI = "\u{E17C}";
     public const WINK_EMOJI = "\u{E185}";
-    public const DEAD_EMOJI = "\u{E193}";
+    public const DEAD_EMOJI = "\u{E194}";
 
     public const BLUSH_SMILE_EMOJI = "\u{E176}";
     public const SMILE_DOWN_EMOJI = "\u{E17A}";

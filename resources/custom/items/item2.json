@@ -1,13 +1,13 @@
 {
-  "identifier": "cylexsky:gray_glass_pane",
+  "identifier": "cylexsky:back_button",
   "type": "normal",
-  "name": "Gray Glass Pane",
+  "name": "Back",
   "flags": {
     "custom": true,
     "creativeInventory": true
   },
   "data": {
-    "texture": "cylex_gray_glass_pane",
+    "texture": "back_button",
     "max_stack_size": 1,
     "properties": {},
     "components": {}

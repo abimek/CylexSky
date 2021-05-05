@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace cylexsky\island\entities;
 
+use core\forms\entity\Button;
 use core\forms\entity\EntityFormTrait;
 use core\main\text\TextFormat;
 use cylexsky\island\Island;
 use cylexsky\island\IslandManager;
+use cylexsky\session\SessionManager;
+use cylexsky\ui\island\IslandUIHandler;
+use cylexsky\ui\player\PlayerUIHandler;
 use cylexsky\utils\Glyphs;
 use pocketmine\entity\Human;
 use pocketmine\entity\Location;
@@ -14,7 +18,7 @@ use pocketmine\entity\Skin;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\Player;
 
-class James extends Human{
+class Henry extends Human{
 
     use EntityFormTrait;
 
@@ -35,10 +39,40 @@ class James extends Human{
         if ($nbt->hasTag(self::ISLAND_ID)){
             $this->islandId = $nbt->getString(self::ISLAND_ID);
         }
-        $this->initEntityForm(Glyphs::JERRY_32 . TextFormat::BOLD_GOLD . "James!");
-        $this->setContent(TextFormat::RED . "Welcome back to your island on " . TextFormat::BOLD_GOLD . "Cylex" . TextFormat::AQUA . "Sky!" . TextFormat::RESET_RED . "My name is " . TextFormat::GOLD . "James" . TextFormat::RED . " and I'm your island villager!");
-        //TODO ADD BUTTONS FOR SHOP AND STUFF
+        $this->initEntityForm(Glyphs::BUBBLE_MESSAGE . TextFormat::BOLD_GOLD . " Henry");
+        $this->setContent(Glyphs::BUBBLE_MESSAGE . TextFormat::RED . " Welcome back to your island on " . TextFormat::BOLD_GOLD . "Cylex" . TextFormat::AQUA . "Sky!" . TextFormat::RESET_RED . " And always remember im here for you when you need me, now go get shoping!" . Glyphs::SMILE_EMOJI);
+        $this->addButton(new Button(Glyphs::GOLD_COIN . TextFormat::GOLD .  " Shop"));
+        $this->addButton(new Button(Glyphs::CROWN . TextFormat::GOLD . " Island UI"));
+        $this->addButton(new Button(Glyphs::BOX_EXCLAMATION . TextFormat::GRAY . "Island Info"));
         parent::initEntity($nbt);
+    }
+
+    public function onButtonInteract(Player $player, Button $button, int $data)
+    {
+        $session = SessionManager::getSession($player->getXuid());
+        if ($session === null || $session->getIsland() === null){
+            return;
+        }
+        switch ($data){
+            case 0:
+                PlayerUIHandler::sendShopUI($session);
+                return;
+            case 1:
+                if ( $session->getIsland() === null){
+                    IslandUIHandler::sendWithoutIsland($session);
+                    return;
+                }else{
+                    IslandUIHandler::sendIslandUI($session);
+                }
+                return;
+            case 2:
+                if ($session->getIsland() === null) {
+                    $session->sendNotification("You're not in an island!");
+                    return;
+                }
+                IslandUIHandler::sendIslandInfoForm($session);
+                return;
+        }
     }
 
     public function entityBaseTick(int $tickDiff = 1): bool

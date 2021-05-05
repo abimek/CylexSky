@@ -15,8 +15,31 @@ use cylexsky\utils\RankIds;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDeathEvent;
+use pocketmine\event\player\PlayerLoginEvent;
+use pocketmine\event\player\PlayerPreLoginEvent;
+use pocketmine\network\mcpe\protocol\types\DeviceOS;
 
 class PlayerSessionListener implements Listener{
+
+    public static $deviceIds = [];
+
+    public function login(PlayerLoginEvent $event){
+        $id = $event->getPlayer()->getUniqueId()->toString();
+        if (isset(self::$deviceIds[$id])){
+            $v = self::$deviceIds[$id];
+            unset(self::$deviceIds[$id]);
+            self::$deviceIds[$event->getPlayer()->getXuid()] = $v;
+        }
+    }
+
+    public function preLogin(PlayerPreLoginEvent $event){
+        $os = $event->getPlayerInfo()->getExtraData()["DeviceOS"];
+        if ($os === DeviceOS::WINDOWS_10){
+            self::$deviceIds[$event->getPlayerInfo()->getUuid()->toString()] = PlayerSession::UI_INV;
+        }else{
+            self::$deviceIds[$event->getPlayerInfo()->getUuid()->toString()] = PlayerSession::UI_FORM;
+        }
+    }
 
     public function onBreak(BlockBreakEvent $event){
         $session = SessionManager::getSession($event->getPlayer()->getXuid());

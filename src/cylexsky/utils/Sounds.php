@@ -15,6 +15,8 @@ class Sounds{
 
     public const BIRD_CHIRPING_SOUND = "random.bird_chirping_spawn";
 
+    public const DING_SOUND = "note.pling";
+
     public static function sendSoundPlayer(Player $player, string $sound, float $pitch = 3.0, float $volume = 6.0)
     {
         $pk = new PlaySoundPacket();

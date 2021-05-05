@@ -7,6 +7,7 @@ use cylexsky\session\SessionManager;
 use cylexsky\utils\Sounds;
 use cylexsky\worlds\worlds\MainWorld;
 use pocketmine\scheduler\Task;
+use pocketmine\world\World;
 
 class SpawnSoundTask extends Task{
 
@@ -21,8 +22,9 @@ class SpawnSoundTask extends Task{
                 continue;
             }
             if ($session->getTogglesModule()->spawnSounds()){
-                Sounds::sendSoundPlayer($player, Sounds::BIRD_CHIRPING_SOUND, 1.0, 3.0);
+                Sounds::sendSoundPlayer($player, Sounds::BIRD_CHIRPING_SOUND, 1.0, 1.0);
             }
         }
+        MainWorld::getWorld()->setTime(World::TIME_NOON);
     }
 }

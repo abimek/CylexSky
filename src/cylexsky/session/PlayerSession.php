@@ -14,6 +14,7 @@ use core\ranks\types\RankTypes;
 use cylexsky\island\Island;
 use cylexsky\island\IslandManager;
 use cylexsky\session\database\PlayerSessionDatabaseHandler;
+use cylexsky\session\listeners\PlayerSessionListener;
 use cylexsky\session\modules\EmojiModule;
 use cylexsky\session\modules\Level;
 use cylexsky\session\modules\MiscModule;
@@ -28,6 +29,9 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 
 class PlayerSession{
+
+    public const UI_INV = 1;
+    public const UI_FORM = 2;
 
     public const SEND_COMMAND_NOTIFICATION_COLOR = TextFormat::RED;
     public const NOTIFICATION_COLOR = TextFormat::GRAY;
@@ -49,6 +53,8 @@ class PlayerSession{
     private $miscModule;
     private $emojisModule;
 
+    private $uiType = self::UI_FORM;
+
     public function __construct(?PlayerObject $object, string $xuid, ?string $island, string $levelData, string $moneyData, string $toggleData, string $statsData, string $trustedData, string $emojisModule)
     {
         $this->xuid = $xuid;
@@ -67,6 +73,20 @@ class PlayerSession{
                 $this->getIslandObject()->ownerJoin($this);
             }
         }
+        $xuid = $this->getXuid();
+        $v = PlayerSessionListener::$deviceIds;
+        if (isset($v[$xuid])){
+            $this->setUiType($v[$xuid]);
+            unset(PlayerSessionListener::$deviceIds[$xuid]);
+        }
+    }
+
+    public function getUiType(){
+        return $this->uiType;
+    }
+
+    public function setUiType(int $type){
+        $this->uiType = $type;
     }
 
     public function getPlayer(): Player{

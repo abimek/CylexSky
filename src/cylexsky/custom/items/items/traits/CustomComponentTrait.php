@@ -5,8 +5,6 @@ namespace cylexsky\custom\items\items\traits;
 
 trait CustomComponentTrait{
 
-    use CustomItemTrait;
-
     public function initPropertiesAndInitialData(){
         $this->initComponentTag(self::getInitData()[0], self::getInitData()[1]);
         foreach (self::getAProperties() as $name => $value){

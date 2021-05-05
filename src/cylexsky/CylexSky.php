@@ -4,6 +4,7 @@ namespace cylexsky;
 
 use core\database\DatabaseManager;
 use cylexsky\main\ManagerLoader;
+use cylexsky\ui\InventoryUI;
 use muqsit\simplepackethandler\SimplePacketHandler;
 use pocketmine\command\defaults\TeleportCommand;
 use pocketmine\command\defaults\TimingsCommand;
@@ -46,6 +47,7 @@ class CylexSky extends PluginBase {
         ManagerLoader::init();
         Server::getInstance()->getCommandMap()->register("tp", new TeleportCommand("tp"));
         Server::getInstance()->getCommandMap()->register("timings", new TimingsCommand("timings"));
+        InventoryUI::init();
     }
 
     protected function onDisable(): void
